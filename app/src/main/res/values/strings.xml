@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Moto Navigator</string>
+    <string name="mapbox_strees_v9">mapbox://styles/mapbox/streets-v9</string>
+    <string name="PUBLIC_TOKEN">pk.eyJ1Ijoib3B0aWNvZCIsImEiOiJjaXF1bHplMnQwMDVvMDRqNmc3bnJ4ZXNyIn0.sYS6SFog947nQwX649-EgQ</string>
 </resources>
