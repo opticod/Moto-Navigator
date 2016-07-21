@@ -35,45 +35,44 @@
             android:textColor="@android:color/black" />
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/location_toggle_fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:layout_margin="16dp"
-            android:src="@drawable/ic_my_location_24dp"
-            mapbox:backgroundTint="#E55E5E" />
-
-        <android.support.design.widget.FloatingActionButton
             android:id="@+id/car_toggle_fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
             android:layout_margin="16dp"
-            android:layout_toLeftOf="@id/location_toggle_fab"
             android:src="@drawable/ic_directions_car_black_24dp"
-            mapbox:backgroundTint="@color/colorAccent2" />
+            mapbox:backgroundTint="@color/floatCar" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/bike_toggle_fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
+            android:layout_above="@id/car_toggle_fab"
+            android:layout_alignParentRight="true"
             android:layout_margin="16dp"
-            android:layout_toLeftOf="@id/car_toggle_fab"
             android:src="@drawable/ic_directions_bike_black_24dp"
-            mapbox:backgroundTint="@color/colorAccent2" />
+            mapbox:backgroundTint="@color/floatBike" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/walk_toggle_fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_above="@id/bike_toggle_fab"
+            android:layout_alignParentRight="true"
+            android:layout_margin="16dp"
+            android:src="@drawable/ic_directions_walk_black_24dp"
+            mapbox:backgroundTint="@color/floatWalk" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/location_toggle_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_margin="16dp"
-            android:layout_toLeftOf="@id/bike_toggle_fab"
-            android:src="@drawable/ic_directions_walk_black_24dp"
-            mapbox:backgroundTint="@color/colorAccent2" />
-
+            android:layout_toLeftOf="@id/car_toggle_fab"
+            android:src="@drawable/ic_my_location_24dp"
+            mapbox:backgroundTint="#E55E5E" />
     </RelativeLayout>
 
 </android.support.design.widget.CoordinatorLayout>

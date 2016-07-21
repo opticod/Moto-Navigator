@@ -6,19 +6,20 @@ import android.animation.TypeEvaluator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -59,6 +60,7 @@ public class MainActivity extends Activity {
     private Marker markerOrigin;
     private Position origin;
     private Position destination;
+    private Polyline routePolyLine;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,11 +77,14 @@ public class MainActivity extends Activity {
                 map = mapboxMap;
 
                 Location lastOrigin = locationServices.getLastLocation();
-                origin = Position.fromCoordinates(lastOrigin.getLongitude(), lastOrigin.getLatitude());
 
-                if (markerOrigin == null) {
-                    markerOrigin = map.addMarker(new MarkerOptions()
-                            .position(new LatLng(lastOrigin.getLatitude(), lastOrigin.getLongitude())).title("Origin").setSnippet("Move marker to set the new origin."));
+                if (lastOrigin != null) {
+                    origin = Position.fromCoordinates(lastOrigin.getLongitude(), lastOrigin.getLatitude());
+
+                    if (markerOrigin == null) {
+                        markerOrigin = map.addMarker(new MarkerOptions()
+                                .position(new LatLng(lastOrigin.getLatitude(), lastOrigin.getLongitude())).title("Origin"));
+                    }
                 }
 
                 mapboxMap.setOnMapClickListener(new MapboxMap.OnMapClickListener() {
@@ -173,7 +178,6 @@ public class MainActivity extends Activity {
             markerDestination = map.addMarker(new MarkerOptions()
                     .position(new LatLng(latitude, longitude)).title("Destination").setSnippet("Move marker to set the new destination."));
         }
-
         destination = Position.fromCoordinates(longitude, latitude);
 
         CameraPosition cameraPosition = new CameraPosition.Builder()
@@ -183,12 +187,15 @@ public class MainActivity extends Activity {
         map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 5000, null);
     }
 
-    private void getRoute(Position origin, Position destination, String profile) throws ServicesException {
+    private void getRoute(Position origin, Position destination, final String profile) throws ServicesException {
+        Log.e("Deb", "Origin :: lat " + origin.getLatitude() + " long " + origin.getLongitude());
+        Log.e("Deb", "Destination :: lat " + destination.getLatitude() + " long " + destination.getLongitude());
 
         MapboxDirections client = new MapboxDirections.Builder()
                 .setOrigin(origin)
                 .setDestination(destination)
                 .setProfile(profile)
+                .setSteps(true)
                 .setAccessToken(getString(R.string.PUBLIC_TOKEN))
                 .build();
 
@@ -204,11 +211,11 @@ public class MainActivity extends Activity {
 
                 // Print some info about the route
                 currentRoute = response.body().getRoutes().get(0);
-                Log.d(TAG, "Distance: " + currentRoute.getDistance());
+                Log.d(TAG, "Distance: " + currentRoute.getDistance() + " " + currentRoute.getLegs().size());
                 Toast.makeText(MainActivity.this, "Route is " + currentRoute.getDistance() + " meters long.", Toast.LENGTH_SHORT).show();
 
                 // Draw the route on the map
-                drawRoute(currentRoute);
+                drawRoute(currentRoute, profile);
             }
 
             @Override
@@ -219,7 +226,7 @@ public class MainActivity extends Activity {
         });
     }
 
-    private void drawRoute(DirectionsRoute route) {
+    private void drawRoute(DirectionsRoute route, String profile) {
         // Convert LineString coordinates into LatLng[]
         LineString lineString = LineString.fromPolyline(route.getGeometry(), Constants.OSRM_PRECISION_V5);
         List<Position> coordinates = lineString.getCoordinates();
@@ -231,9 +238,22 @@ public class MainActivity extends Activity {
         }
 
         // Draw Points on MapView
-        map.addPolyline(new PolylineOptions()
+        int color;
+        if (profile.equals(DirectionsCriteria.PROFILE_CYCLING)) {
+            color = ContextCompat.getColor(getApplicationContext(), R.color.polyBike);
+        } else if (profile.equals(DirectionsCriteria.PROFILE_DRIVING)) {
+            color = ContextCompat.getColor(getApplicationContext(), R.color.polyCar);
+        } else {
+            color = ContextCompat.getColor(getApplicationContext(), R.color.polyWalk);
+        }
+
+        if (routePolyLine != null) {
+            map.removePolyline(routePolyLine);
+        }
+
+        routePolyLine = map.addPolyline(new PolylineOptions()
                 .add(points)
-                .color(Color.parseColor("#009688"))
+                .color(color)
                 .width(5));
     }
 
@@ -289,6 +309,11 @@ public class MainActivity extends Activity {
                 @Override
                 public void onLocationChanged(Location location) {
                     if (location != null) {
+
+                        if (markerOrigin == null) {
+                            markerOrigin = map.addMarker(new MarkerOptions()
+                                    .position(new LatLng(location.getLatitude(), location.getLongitude())).title("Origin"));
+                        }
 
                         markerOrigin.setPosition(new LatLng(location.getLatitude(), location.getLongitude()));
                         origin = Position.fromCoordinates(location.getLongitude(), location.getLatitude());
