@@ -7,6 +7,7 @@ import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -18,6 +19,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.mapbox.mapboxsdk.annotations.Icon;
+import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.Polyline;
@@ -89,8 +92,12 @@ public class MainActivity extends Activity {
                     origin = Position.fromCoordinates(lastOrigin.getLongitude(), lastOrigin.getLatitude());
 
                     if (markerOrigin == null) {
+                        IconFactory iconFactory = IconFactory.getInstance(MainActivity.this);
+                        Drawable iconDrawable = ContextCompat.getDrawable(MainActivity.this, R.drawable.default_marker);
+                        Icon icon = iconFactory.fromDrawable(iconDrawable);
+
                         markerOrigin = map.addMarker(new MarkerOptions()
-                                .position(new LatLng(lastOrigin.getLatitude(), lastOrigin.getLongitude())).title("Origin"));
+                                .position(new LatLng(lastOrigin.getLatitude(), lastOrigin.getLongitude())).title("Origin").icon(icon));
                     }
                 }
 
@@ -195,8 +202,20 @@ public class MainActivity extends Activity {
     }
 
     private void getRoute(Position origin, Position destination, final String profile) throws ServicesException {
-        Log.e("Deb", "Origin :: lat " + origin.getLatitude() + " long " + origin.getLongitude());
-        Log.e("Deb", "Destination :: lat " + destination.getLatitude() + " long " + destination.getLongitude());
+
+        if (null == origin) {
+            Log.e(TAG, "Origin empty");
+            Toast.makeText(MainActivity.this, "Set Origin!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (null == destination) {
+            Log.e(TAG, "Destination empty");
+            Toast.makeText(MainActivity.this, "Set Destination!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Log.d(TAG, "Origin :: lat " + origin.getLatitude() + " long " + origin.getLongitude());
+        Log.d(TAG, "Destination :: lat " + destination.getLatitude() + " long " + destination.getLongitude());
 
         MapboxDirections client = new MapboxDirections.Builder()
                 .setOrigin(origin)
@@ -354,8 +373,12 @@ public class MainActivity extends Activity {
                     if (location != null) {
 
                         if (markerOrigin == null) {
+                            IconFactory iconFactory = IconFactory.getInstance(MainActivity.this);
+                            Drawable iconDrawable = ContextCompat.getDrawable(MainActivity.this, R.drawable.default_marker);
+                            Icon icon = iconFactory.fromDrawable(iconDrawable);
+
                             markerOrigin = map.addMarker(new MarkerOptions()
-                                    .position(new LatLng(location.getLatitude(), location.getLongitude())).title("Origin"));
+                                    .position(new LatLng(location.getLatitude(), location.getLongitude())).title("Origin").icon(icon));
                         }
 
                         markerOrigin.setPosition(new LatLng(location.getLatitude(), location.getLongitude()));
