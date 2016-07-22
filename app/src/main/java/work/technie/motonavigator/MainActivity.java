@@ -5,6 +5,7 @@ import android.animation.ObjectAnimator;
 import android.animation.TypeEvaluator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -38,14 +39,20 @@ import com.mapbox.services.directions.v5.DirectionsCriteria;
 import com.mapbox.services.directions.v5.MapboxDirections;
 import com.mapbox.services.directions.v5.models.DirectionsResponse;
 import com.mapbox.services.directions.v5.models.DirectionsRoute;
+import com.mapbox.services.directions.v5.models.LegStep;
+import com.mapbox.services.directions.v5.models.RouteLeg;
+import com.mapbox.services.directions.v5.models.StepManeuver;
 import com.mapbox.services.geocoding.v5.GeocodingCriteria;
 import com.mapbox.services.geocoding.v5.models.GeocodingFeature;
 
 import java.util.List;
+import java.util.Vector;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import work.technie.motonavigator.data.Db;
+import work.technie.motonavigator.data.DbContract;
 
 public class MainActivity extends Activity {
 
@@ -207,6 +214,42 @@ public class MainActivity extends Activity {
                 if (response.body() == null) {
                     Log.e(TAG, "No routes found, make sure you set the right user and access token.");
                     return;
+                }
+
+
+                RouteLeg mLeg = response.body().getRoutes().get(0).getLegs().get(0);
+
+                ContentValues mRoute = new ContentValues();
+                mRoute.put(DbContract.Route.DISTANCE, String.valueOf(mLeg.getDistance()));
+                mRoute.put(DbContract.Route.DURATION, String.valueOf(mLeg.getDuration()));
+
+                Vector<ContentValues> cVVectorSteps = new Vector<>();
+                for (LegStep mSteps : mLeg.getSteps()) {
+
+                    ContentValues steps = new ContentValues();
+                    StepManeuver maneuver = mSteps.getManeuver();
+                    steps.put(DbContract.Steps.BEARING_BEFORE, String.valueOf(maneuver.getBearingBefore()));
+                    steps.put(DbContract.Steps.BEARING_AFTER, String.valueOf(maneuver.getBearingAfter()));
+                    steps.put(DbContract.Steps.LOCATION_LAT, String.valueOf(maneuver.getLocation()[1]));
+                    steps.put(DbContract.Steps.LOCATION_LONG, String.valueOf(maneuver.getLocation()[0]));
+                    steps.put(DbContract.Steps.TYPE, maneuver.getType());
+                    steps.put(DbContract.Steps.INSTRUCTION, maneuver.getInstruction());
+                    steps.put(DbContract.Steps.MODE, mSteps.getMode());
+                    steps.put(DbContract.Steps.DURATION, String.valueOf(mSteps.getDuration()));
+                    steps.put(DbContract.Steps.NAME, mSteps.getName());
+                    steps.put(DbContract.Steps.DISTANCE, String.valueOf(mSteps.getDistance()));
+
+                    cVVectorSteps.add(steps);
+                }
+                if (cVVectorSteps.size() > 0) {
+                    ContentValues[] cvArray = new ContentValues[cVVectorSteps.size()];
+                    cVVectorSteps.toArray(cvArray);
+                    Db db = new Db(getApplicationContext());
+                    db.open();
+                    db.clearDatabaseTable(DbContract.Steps.TABLE_NAME);
+                    db.clearDatabaseTable(DbContract.Route.TABLE_NAME);
+                    db.bulkInsertRouteSteps(mRoute, cvArray);
+                    db.close();
                 }
 
                 // Print some info about the route
