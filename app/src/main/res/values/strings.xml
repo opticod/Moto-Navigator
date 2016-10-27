@@ -6,4 +6,6 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+    <string name="about_text">\nLicensed under the Apache License v2.\n \t \t \t Source available on <a href="https://github.com/opticod/moto-navigator">GitHub</a>.\n</string>
+
 </resources>

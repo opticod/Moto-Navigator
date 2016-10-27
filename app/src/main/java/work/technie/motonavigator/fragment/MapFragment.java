@@ -1,4 +1,4 @@
-package work.technie.motonavigator;
+package work.technie.motonavigator.fragment;
 
 import android.Manifest;
 import android.animation.ObjectAnimator;
@@ -14,9 +14,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.annotations.Icon;
@@ -54,12 +57,13 @@ import java.util.Vector;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import work.technie.motonavigator.R;
 import work.technie.motonavigator.data.Db;
 import work.technie.motonavigator.data.DbContract;
 
-public class MapActivity extends Activity {
+public class MapFragment extends Fragment {
 
-    private final static String TAG = "MapActivity";
+    private final static String TAG = "MapFragment";
     private static final int PERMISSIONS_LOCATION = 0;
     FloatingActionButton floatingActionButton;
     LocationServices locationServices;
@@ -71,14 +75,18 @@ public class MapActivity extends Activity {
     private Position origin;
     private Position destination;
     private Polyline routePolyLine;
+    private Activity mActivity;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_map);
-        locationServices = LocationServices.getLocationServices(MapActivity.this);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
+        View rootView = inflater.inflate(R.layout.activity_map, container, false);
 
-        mapView = (MapView) findViewById(R.id.mapView);
+        mActivity = getActivity();
+
+        locationServices = LocationServices.getLocationServices(mActivity);
+
+        mapView = (MapView) rootView.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
 
         mapView.getMapAsync(new OnMapReadyCallback() {
@@ -92,8 +100,8 @@ public class MapActivity extends Activity {
                     origin = Position.fromCoordinates(lastOrigin.getLongitude(), lastOrigin.getLatitude());
 
                     if (markerOrigin == null) {
-                        IconFactory iconFactory = IconFactory.getInstance(MapActivity.this);
-                        Drawable iconDrawable = ContextCompat.getDrawable(MapActivity.this, R.drawable.default_marker);
+                        IconFactory iconFactory = IconFactory.getInstance(mActivity);
+                        Drawable iconDrawable = ContextCompat.getDrawable(mActivity, R.drawable.default_marker);
                         Icon icon = iconFactory.fromDrawable(iconDrawable);
 
                         markerOrigin = map.addMarker(new MarkerOptions()
@@ -120,7 +128,7 @@ public class MapActivity extends Activity {
             }
         });
 
-        GeocoderAutoCompleteView autocompleteDestination = (GeocoderAutoCompleteView) findViewById(R.id.query_destination);
+        GeocoderAutoCompleteView autocompleteDestination = (GeocoderAutoCompleteView) rootView.findViewById(R.id.query_destination);
         autocompleteDestination.setAccessToken(getString(R.string.PUBLIC_TOKEN));
         autocompleteDestination.setType(GeocodingCriteria.TYPE_POI);
         autocompleteDestination.setOnFeatureListener(new GeocoderAutoCompleteView.OnFeatureListener() {
@@ -131,7 +139,7 @@ public class MapActivity extends Activity {
             }
         });
 
-        floatingActionButton = (FloatingActionButton) findViewById(R.id.location_toggle_fab);
+        floatingActionButton = (FloatingActionButton) rootView.findViewById(R.id.location_toggle_fab);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -141,7 +149,7 @@ public class MapActivity extends Activity {
             }
         });
 
-        FloatingActionButton walkDriveActionButton = (FloatingActionButton) findViewById(R.id.walk_toggle_fab);
+        FloatingActionButton walkDriveActionButton = (FloatingActionButton) rootView.findViewById(R.id.walk_toggle_fab);
         walkDriveActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -155,7 +163,7 @@ public class MapActivity extends Activity {
             }
         });
 
-        FloatingActionButton bikeDriveActionButton = (FloatingActionButton) findViewById(R.id.bike_toggle_fab);
+        FloatingActionButton bikeDriveActionButton = (FloatingActionButton) rootView.findViewById(R.id.bike_toggle_fab);
         bikeDriveActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -169,7 +177,7 @@ public class MapActivity extends Activity {
             }
         });
 
-        FloatingActionButton carDriveActionButton = (FloatingActionButton) findViewById(R.id.car_toggle_fab);
+        FloatingActionButton carDriveActionButton = (FloatingActionButton) rootView.findViewById(R.id.car_toggle_fab);
         carDriveActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -183,7 +191,7 @@ public class MapActivity extends Activity {
             }
         });
 
-
+        return rootView;
     }
 
     private void updateMap(double latitude, double longitude) {
@@ -205,12 +213,12 @@ public class MapActivity extends Activity {
 
         if (null == origin) {
             Log.e(TAG, "Origin empty");
-            Toast.makeText(MapActivity.this, "Set Origin!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mActivity, "Set Origin!", Toast.LENGTH_SHORT).show();
             return;
         }
         if (null == destination) {
             Log.e(TAG, "Destination empty");
-            Toast.makeText(MapActivity.this, "Set Destination!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mActivity, "Set Destination!", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -263,7 +271,7 @@ public class MapActivity extends Activity {
                 if (cVVectorSteps.size() > 0) {
                     ContentValues[] cvArray = new ContentValues[cVVectorSteps.size()];
                     cVVectorSteps.toArray(cvArray);
-                    Db db = new Db(getApplicationContext());
+                    Db db = new Db(mActivity);
                     db.open();
                     db.clearDatabaseTable(DbContract.Steps.TABLE_NAME);
                     db.clearDatabaseTable(DbContract.Route.TABLE_NAME);
@@ -274,7 +282,7 @@ public class MapActivity extends Activity {
                 // Print some info about the route
                 currentRoute = response.body().getRoutes().get(0);
                 Log.d(TAG, "Distance: " + currentRoute.getDistance() + " " + currentRoute.getLegs().size());
-                Toast.makeText(MapActivity.this, "Route is " + currentRoute.getDistance() + " meters long.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mActivity, "Route is " + currentRoute.getDistance() + " meters long.", Toast.LENGTH_SHORT).show();
 
                 // Draw the route on the map
                 drawRoute(currentRoute, profile);
@@ -283,7 +291,7 @@ public class MapActivity extends Activity {
             @Override
             public void onFailure(Call<DirectionsResponse> call, Throwable t) {
                 Log.e(TAG, "Error: " + t.getMessage());
-                Toast.makeText(MapActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(mActivity, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -302,11 +310,11 @@ public class MapActivity extends Activity {
         // Draw Points on MapView
         int color;
         if (profile.equals(DirectionsCriteria.PROFILE_CYCLING)) {
-            color = ContextCompat.getColor(getApplicationContext(), R.color.polyBike);
+            color = ContextCompat.getColor(mActivity, R.color.polyBike);
         } else if (profile.equals(DirectionsCriteria.PROFILE_DRIVING)) {
-            color = ContextCompat.getColor(getApplicationContext(), R.color.polyCar);
+            color = ContextCompat.getColor(mActivity, R.color.polyCar);
         } else {
-            color = ContextCompat.getColor(getApplicationContext(), R.color.polyWalk);
+            color = ContextCompat.getColor(mActivity, R.color.polyWalk);
         }
 
         if (routePolyLine != null) {
@@ -332,14 +340,14 @@ public class MapActivity extends Activity {
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         mapView.onSaveInstanceState(outState);
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    public void onDestroyView() {
+        super.onDestroyView();
         mapView.onDestroy();
     }
 
@@ -354,7 +362,7 @@ public class MapActivity extends Activity {
         if (enableGps) {
             // Check if user has granted location permission
             if (!locationServices.areLocationPermissionsGranted()) {
-                ActivityCompat.requestPermissions(this, new String[]{
+                ActivityCompat.requestPermissions(mActivity, new String[]{
                         Manifest.permission.ACCESS_COARSE_LOCATION,
                         Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_LOCATION);
             } else {
@@ -373,8 +381,8 @@ public class MapActivity extends Activity {
                     if (location != null) {
 
                         if (markerOrigin == null) {
-                            IconFactory iconFactory = IconFactory.getInstance(MapActivity.this);
-                            Drawable iconDrawable = ContextCompat.getDrawable(MapActivity.this, R.drawable.default_marker);
+                            IconFactory iconFactory = IconFactory.getInstance(mActivity);
+                            Drawable iconDrawable = ContextCompat.getDrawable(mActivity, R.drawable.default_marker);
                             Icon icon = iconFactory.fromDrawable(iconDrawable);
 
                             markerOrigin = map.addMarker(new MarkerOptions()

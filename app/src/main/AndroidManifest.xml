@@ -25,9 +25,6 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".MapActivity"
-            android:theme="@style/AppThemeNoActionBar"></activity>
         <service android:name="com.mapbox.mapboxsdk.telemetry.TelemetryService" />
 
     </application>
