@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void doMenuAction(int menuItemId) {
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         FragmentManager fragmentManager = getSupportFragmentManager();
         switch (menuItemId) {
             case R.id.nav_map:
@@ -84,6 +85,7 @@ public class MainActivity extends AppCompatActivity
                 if (getSupportActionBar() != null) {
                     getSupportActionBar().setTitle("Map");
                 }
+                navigationView.getMenu().getItem(0).setChecked(true);
                 break;
             case R.id.nav_directions:
                 //Add transaction to navigation fragment
@@ -97,6 +99,7 @@ public class MainActivity extends AppCompatActivity
                 if (getSupportActionBar() != null) {
                     getSupportActionBar().setTitle("About");
                 }
+                navigationView.getMenu().getItem(3).setChecked(true);
                 break;
             case R.id.nav_sign_out:
                 //Add functionality to sign out
