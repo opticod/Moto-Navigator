@@ -8,6 +8,8 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -25,6 +27,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.annotations.Icon;
@@ -56,7 +59,9 @@ import com.mapbox.services.directions.v5.models.StepManeuver;
 import com.mapbox.services.geocoding.v5.GeocodingCriteria;
 import com.mapbox.services.geocoding.v5.models.GeocodingFeature;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Vector;
 
 import retrofit2.Call;
@@ -74,7 +79,8 @@ public class MapActivity extends BaseActivity {
 
     private final static String TAG = "MapFragment";
     private static final int PERMISSIONS_LOCATION = 0;
-    FloatingActionButton floatingActionButton;
+    FloatingActionButton floatingActionButtonA;
+    FloatingActionButton floatingActionButtonB;
     LocationServices locationServices;
     private MapView mapView;
     private MapboxMap map;
@@ -151,7 +157,20 @@ public class MapActivity extends BaseActivity {
             }
         });
 
-        GeocoderAutoCompleteView autocompleteDestination = (GeocoderAutoCompleteView) findViewById(R.id.query_destination);
+
+        final GeocoderAutoCompleteView autocompleteStart = (GeocoderAutoCompleteView) findViewById(R.id.query_start);
+        autocompleteStart.setAccessToken(getString(R.string.PUBLIC_TOKEN));
+        autocompleteStart.setType(GeocodingCriteria.TYPE_POI);
+        autocompleteStart.setOnFeatureListener(new GeocoderAutoCompleteView.OnFeatureListener() {
+            @Override
+            public void OnFeatureClick(GeocodingFeature feature) {
+                Position position = feature.asPosition();
+                updateMap(position.getLatitude(), position.getLongitude());
+            }
+        });
+
+
+        final GeocoderAutoCompleteView autocompleteDestination = (GeocoderAutoCompleteView) findViewById(R.id.query_destination);
         autocompleteDestination.setAccessToken(getString(R.string.PUBLIC_TOKEN));
         autocompleteDestination.setType(GeocodingCriteria.TYPE_POI);
         autocompleteDestination.setOnFeatureListener(new GeocoderAutoCompleteView.OnFeatureListener() {
@@ -162,8 +181,9 @@ public class MapActivity extends BaseActivity {
             }
         });
 
-        floatingActionButton = (FloatingActionButton) findViewById(R.id.location_toggle_fab);
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+
+        floatingActionButtonA = (FloatingActionButton) findViewById(R.id.location_toggle_fab1);
+        floatingActionButtonA.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (map != null) {
@@ -172,6 +192,56 @@ public class MapActivity extends BaseActivity {
             }
         });
 
+        floatingActionButtonB = (FloatingActionButton) findViewById(R.id.location_toggle_fab2);
+        floatingActionButtonB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (map != null) {
+                    toggleGps(!map.isMyLocationEnabled());
+                }
+            }
+        });
+
+        ImageButton getCurrentLoc = (ImageButton) findViewById(R.id.get_current_location);
+
+        getCurrentLoc.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Location loc = map.getMyLocation();
+                List<Address> address = null;
+                if (loc == null) {
+                    loc = enableLocation(true);
+                }
+                if (loc != null) {
+                    Geocoder geocoder = new Geocoder(mActivity, Locale.getDefault());
+                    try {
+                        address = geocoder.getFromLocation(
+                                loc.getLatitude(),
+                                loc.getLongitude(),
+                                1);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (address != null) {
+                    autocompleteStart.setText(address.get(0).getFeatureName());
+                }
+                autocompleteStart.requestFocus();
+            }
+        });
+
+        ImageButton swapLoc = (ImageButton) findViewById(R.id.swap_endpoints);
+        swapLoc.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String start = autocompleteStart.getText().toString();
+                String destination = autocompleteDestination.getText().toString();
+                autocompleteStart.setText(destination);
+                autocompleteDestination.setText(start);
+            }
+        });
+
+/*
         FloatingActionButton walkDriveActionButton = (FloatingActionButton) findViewById(R.id.walk_toggle_fab);
         walkDriveActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -212,11 +282,13 @@ public class MapActivity extends BaseActivity {
                     }
                 }
             }
-        });
+        });*/
 
         final CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
 
         collapsingToolbarLayout.setTitle(" ");
+        findViewById(R.id.location_toggle_fab1).setVisibility(View.VISIBLE);
+        findViewById(R.id.location_toggle_fab2).setVisibility(View.INVISIBLE);
 
         appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             boolean isShow = false;
@@ -229,10 +301,15 @@ public class MapActivity extends BaseActivity {
                 }
                 if (scrollRange + verticalOffset == 0) {
                     collapsingToolbarLayout.setTitle("Choose Destination...");
+                    floatingActionButtonA.setVisibility(View.INVISIBLE);
+                    floatingActionButtonB.setVisibility(View.VISIBLE);
                     isShow = true;
                 } else if (isShow) {
                     collapsingToolbarLayout.setTitle(" ");//carefull there should a space between double quote otherwise it wont work
                     isShow = false;
+                    floatingActionButtonA.setVisibility(View.VISIBLE);
+                    floatingActionButtonB.setVisibility(View.INVISIBLE);
+
                 }
             }
         });
@@ -245,6 +322,8 @@ public class MapActivity extends BaseActivity {
         });
 
         appBarLayout.setExpanded(true, true);
+        floatingActionButtonA.setVisibility(View.VISIBLE);
+        floatingActionButtonB.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -258,8 +337,6 @@ public class MapActivity extends BaseActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.app_bar_layout);
-        appBarLayout.setExpanded(true, true);
         return super.onOptionsItemSelected(item);
     }
 
@@ -442,13 +519,14 @@ public class MapActivity extends BaseActivity {
         }
     }
 
-    private void enableLocation(boolean enabled) {
+    private Location enableLocation(boolean enabled) {
+        final Location[] newLocation = {null};
         if (enabled) {
             locationServices.addLocationListener(new LocationListener() {
                 @Override
                 public void onLocationChanged(Location location) {
                     if (location != null) {
-
+                        newLocation[0] = location;
                         if (markerOrigin == null) {
                             IconFactory iconFactory = IconFactory.getInstance(mActivity);
                             Drawable iconDrawable = ContextCompat.getDrawable(mActivity, R.drawable.default_marker);
@@ -467,12 +545,15 @@ public class MapActivity extends BaseActivity {
                     }
                 }
             });
-            floatingActionButton.setImageResource(R.drawable.ic_location_disabled_24dp);
+            floatingActionButtonA.setImageResource(R.drawable.ic_location_disabled_24dp);
+            floatingActionButtonB.setImageResource(R.drawable.ic_location_disabled_24dp);
         } else {
-            floatingActionButton.setImageResource(R.drawable.ic_my_location_24dp);
+            floatingActionButtonA.setImageResource(R.drawable.ic_my_location_24dp);
+            floatingActionButtonB.setImageResource(R.drawable.ic_my_location_24dp);
         }
         // Enable or disable the location layer on the map
         map.setMyLocationEnabled(enabled);
+        return newLocation[0];
     }
 
     @Override
