@@ -26,7 +26,7 @@
 
         <activity
             android:name=".activity.BaseActivity"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activity.MapActivity"
             android:theme="@style/AppTheme.NoActionBar">

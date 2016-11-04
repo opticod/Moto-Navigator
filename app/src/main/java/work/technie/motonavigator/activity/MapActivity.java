@@ -21,6 +21,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -228,14 +230,15 @@ public class MapActivity extends BaseActivity {
             }
         });
 
-
         Button walkPath = (Button) findViewById(R.id.walk);
         walkPath.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (map != null) {
                     try {
-                        getRoute(origin, destination, DirectionsCriteria.PROFILE_WALKING);
+                        if (validateForm(autocompleteStart, autocompleteDestination)) {
+                            getRoute(origin, destination, DirectionsCriteria.PROFILE_WALKING);
+                        }
                     } catch (ServicesException e) {
                         e.printStackTrace();
                     }
@@ -249,7 +252,9 @@ public class MapActivity extends BaseActivity {
             public void onClick(View v) {
                 if (map != null) {
                     try {
-                        getRoute(origin, destination, DirectionsCriteria.PROFILE_CYCLING);
+                        if (validateForm(autocompleteStart, autocompleteDestination)) {
+                            getRoute(origin, destination, DirectionsCriteria.PROFILE_CYCLING);
+                        }
                     } catch (ServicesException e) {
                         e.printStackTrace();
                     }
@@ -263,7 +268,9 @@ public class MapActivity extends BaseActivity {
             public void onClick(View v) {
                 if (map != null) {
                     try {
-                        getRoute(origin, destination, DirectionsCriteria.PROFILE_DRIVING);
+                        if (validateForm(autocompleteStart, autocompleteDestination)) {
+                            getRoute(origin, destination, DirectionsCriteria.PROFILE_DRIVING);
+                        }
                     } catch (ServicesException e) {
                         e.printStackTrace();
                     }
@@ -311,6 +318,28 @@ public class MapActivity extends BaseActivity {
         appBarLayout.setExpanded(true, true);
         floatingActionButtonA.setVisibility(View.VISIBLE);
         floatingActionButtonB.setVisibility(View.INVISIBLE);
+    }
+
+    private boolean validateForm(GeocoderAutoCompleteView autocompleteStart, GeocoderAutoCompleteView autoCompleteDestination) {
+        boolean valid = true;
+
+        String origin = autocompleteStart.getText().toString();
+        if (TextUtils.isEmpty(origin)) {
+            autocompleteStart.setError(Html.fromHtml("<font color='Red'>Required.</font>"));
+            valid = false;
+        } else {
+            autocompleteStart.setError(null);
+        }
+
+        String destination = autoCompleteDestination.getText().toString();
+        if (TextUtils.isEmpty(destination)) {
+            autoCompleteDestination.setError(Html.fromHtml("<font color='Red'>Required.</font>"));
+            valid = false;
+        } else {
+            autoCompleteDestination.setError(null);
+        }
+
+        return valid;
     }
 
     @Override
