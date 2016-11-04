@@ -44,8 +44,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
-import work.technie.motonavigator.MainActivity;
 import work.technie.motonavigator.R;
+import work.technie.motonavigator.activity.MapActivity;
 
 /**
  * Created by anupam on 29/10/16.
@@ -135,7 +135,7 @@ public class AuthActivity extends BaseActivity implements
                         editor.putInt("LOGIN_MODE", ANONYMOUS_SIGN_IN);
                         editor.apply();
 
-                        Intent intent = new Intent(mActivity, MainActivity.class);
+                        Intent intent = new Intent(mActivity, MapActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
 
@@ -176,7 +176,7 @@ public class AuthActivity extends BaseActivity implements
                 editor.putInt("LOGIN_MODE", GOOGLE_SIGN_IN);
                 editor.apply();
 
-                Intent intent = new Intent(this, MainActivity.class);
+                Intent intent = new Intent(this, MapActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                 this.startActivity(intent);
 
@@ -303,7 +303,7 @@ public class AuthActivity extends BaseActivity implements
                             editor.putInt("LOGIN_MODE", EMAIL_PASSWORD_SIGN_IN);
                             editor.apply();
 
-                            Intent intent = new Intent(mActivity, MainActivity.class);
+                            Intent intent = new Intent(mActivity, MapActivity.class);
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(intent);
                         }
@@ -350,7 +350,7 @@ public class AuthActivity extends BaseActivity implements
                             editor.putInt("LOGIN_MODE", EMAIL_PASSWORD_SIGN_IN);
                             editor.apply();
 
-                            Intent intent = new Intent(mActivity, MainActivity.class);
+                            Intent intent = new Intent(mActivity, MapActivity.class);
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(intent);
                         }

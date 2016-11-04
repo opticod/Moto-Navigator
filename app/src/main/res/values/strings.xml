@@ -64,5 +64,6 @@
 
     <string name="id_fmt">User ID: %s</string>
     <string name="email_fmt">Email: %s</string>
+    <string name="choose_destination">Choose Destination</string>
 
 </resources>

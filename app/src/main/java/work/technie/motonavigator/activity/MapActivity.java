@@ -1,4 +1,4 @@
-package work.technie.motonavigator.fragment;
+package work.technie.motonavigator.activity;
 
 import android.Manifest;
 import android.animation.ObjectAnimator;
@@ -12,14 +12,19 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.annotations.Icon;
@@ -61,7 +66,11 @@ import work.technie.motonavigator.R;
 import work.technie.motonavigator.data.Db;
 import work.technie.motonavigator.data.DbContract;
 
-public class MapFragment extends Fragment {
+/**
+ * Created by anupam on 31/10/16.
+ */
+
+public class MapActivity extends BaseActivity {
 
     private final static String TAG = "MapFragment";
     private static final int PERMISSIONS_LOCATION = 0;
@@ -78,22 +87,33 @@ public class MapFragment extends Fragment {
     private Activity mActivity;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        setHasOptionsMenu(true);
-        View rootView = inflater.inflate(R.layout.fragment_map, container, false);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_map);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-        mActivity = getActivity();
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
 
-        locationServices = LocationServices.getLocationServices(mActivity);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
 
-        mapView = (MapView) rootView.findViewById(R.id.mapView);
+        mActivity = this;
+
+        locationServices = LocationServices.getLocationServices(this);
+
+        mapView = (MapView) findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
+        final AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.app_bar_layout);
 
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(MapboxMap mapboxMap) {
                 map = mapboxMap;
-
                 Location lastOrigin = locationServices.getLastLocation();
 
                 if (lastOrigin != null) {
@@ -113,6 +133,8 @@ public class MapFragment extends Fragment {
                     @Override
                     public void onMapClick(@NonNull LatLng point) {
 
+                        appBarLayout.setExpanded(false);
+
                         destination = Position.fromCoordinates(point.getLongitude(), point.getLatitude());
                         if (markerDestination == null) {
                             markerDestination = map.addMarker(new MarkerOptions()
@@ -123,12 +145,13 @@ public class MapFragment extends Fragment {
                                 new LatLngEvaluator(), markerDestination.getPosition(), point);
                         markerAnimator.setDuration(1000);
                         markerAnimator.start();
+
                     }
                 });
             }
         });
 
-        GeocoderAutoCompleteView autocompleteDestination = (GeocoderAutoCompleteView) rootView.findViewById(R.id.query_destination);
+        GeocoderAutoCompleteView autocompleteDestination = (GeocoderAutoCompleteView) findViewById(R.id.query_destination);
         autocompleteDestination.setAccessToken(getString(R.string.PUBLIC_TOKEN));
         autocompleteDestination.setType(GeocodingCriteria.TYPE_POI);
         autocompleteDestination.setOnFeatureListener(new GeocoderAutoCompleteView.OnFeatureListener() {
@@ -139,7 +162,7 @@ public class MapFragment extends Fragment {
             }
         });
 
-        floatingActionButton = (FloatingActionButton) rootView.findViewById(R.id.location_toggle_fab);
+        floatingActionButton = (FloatingActionButton) findViewById(R.id.location_toggle_fab);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -149,7 +172,7 @@ public class MapFragment extends Fragment {
             }
         });
 
-        FloatingActionButton walkDriveActionButton = (FloatingActionButton) rootView.findViewById(R.id.walk_toggle_fab);
+        FloatingActionButton walkDriveActionButton = (FloatingActionButton) findViewById(R.id.walk_toggle_fab);
         walkDriveActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -163,7 +186,7 @@ public class MapFragment extends Fragment {
             }
         });
 
-        FloatingActionButton bikeDriveActionButton = (FloatingActionButton) rootView.findViewById(R.id.bike_toggle_fab);
+        FloatingActionButton bikeDriveActionButton = (FloatingActionButton) findViewById(R.id.bike_toggle_fab);
         bikeDriveActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -177,7 +200,7 @@ public class MapFragment extends Fragment {
             }
         });
 
-        FloatingActionButton carDriveActionButton = (FloatingActionButton) rootView.findViewById(R.id.car_toggle_fab);
+        FloatingActionButton carDriveActionButton = (FloatingActionButton) findViewById(R.id.car_toggle_fab);
         carDriveActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -191,7 +214,49 @@ public class MapFragment extends Fragment {
             }
         });
 
-        return rootView;
+        final CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+
+        collapsingToolbarLayout.setTitle(" ");
+
+        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+            boolean isShow = false;
+            int scrollRange = -1;
+
+            @Override
+            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                if (scrollRange == -1) {
+                    scrollRange = appBarLayout.getTotalScrollRange();
+                }
+                if (scrollRange + verticalOffset == 0) {
+                    collapsingToolbarLayout.setTitle("Choose Destination");
+                    isShow = true;
+                } else if (isShow) {
+                    collapsingToolbarLayout.setTitle(" ");//carefull there should a space between double quote otherwise it wont work
+                    isShow = false;
+                }
+            }
+        });
+
+        toolbar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                appBarLayout.setExpanded(true, true);
+            }
+        });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        return super.onOptionsItemSelected(item);
     }
 
     private void updateMap(double latitude, double longitude) {
@@ -346,8 +411,8 @@ public class MapFragment extends Fragment {
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    public void onDestroy() {
+        super.onDestroy();
         mapView.onDestroy();
     }
 

@@ -1,4 +1,4 @@
-package work.technie.motonavigator;
+package work.technie.motonavigator.activity;
 
 import android.content.Context;
 import android.content.Intent;
@@ -25,17 +25,21 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.firebase.auth.FirebaseAuth;
 
+import work.technie.motonavigator.R;
 import work.technie.motonavigator.auth.AuthActivity;
 import work.technie.motonavigator.fragment.AboutFragment;
-import work.technie.motonavigator.fragment.MapFragment;
 
-public class MainActivity extends AppCompatActivity
+/**
+ * Created by anupam on 31/10/16.
+ */
+
+public class BaseActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         GoogleApiClient.OnConnectionFailedListener {
 
     private static final String FRAGMENT_TAG_MAP = "MAP_FRAGMENT";
     private final static String STATE_FRAGMENT = "stateFragment";
-    private static final String TAG = "MainActivity";
+    private static final String TAG = "BaseActivity";
 
     private final String FRAGMENT_TAG_REST = "FTAGR";
     private int currentMenuItemId;
@@ -62,9 +66,6 @@ public class MainActivity extends AppCompatActivity
             currentMenuItemId = savedInstanceState.getInt(STATE_FRAGMENT);
         }
 
-        if (getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG_MAP) == null && getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG_REST) == null) {
-            doMenuAction(currentMenuItemId);
-        }
     }
 
     @Override
@@ -98,12 +99,18 @@ public class MainActivity extends AppCompatActivity
         FragmentManager fragmentManager = getSupportFragmentManager();
         switch (menuItemId) {
             case R.id.nav_map:
+                /*
                 fragmentManager.beginTransaction()
                         .replace(R.id.content_main, new MapFragment(), FRAGMENT_TAG_MAP).commit();
                 if (getSupportActionBar() != null) {
                     getSupportActionBar().setTitle("Map");
                 }
-                navigationView.getMenu().getItem(0).setChecked(true);
+                navigationView.getMenu().getItem(0).setChecked(true);*/
+
+                Intent intent = new Intent(this, MapActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                this.startActivity(intent);
+
                 break;
             case R.id.nav_directions:
                 //Add transaction to navigation fragment
