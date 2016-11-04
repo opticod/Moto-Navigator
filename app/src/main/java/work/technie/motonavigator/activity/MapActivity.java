@@ -176,7 +176,7 @@ public class MapActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 if (map != null) {
-                    toggleGps(!map.isMyLocationEnabled());
+                    toggleGps(!map.isMyLocationEnabled(), false, null);
                 }
             }
         });
@@ -186,7 +186,7 @@ public class MapActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 if (map != null) {
-                    toggleGps(!map.isMyLocationEnabled());
+                    toggleGps(!map.isMyLocationEnabled(), false, null);
                 }
             }
         });
@@ -199,21 +199,7 @@ public class MapActivity extends BaseActivity {
                 Location loc = map.getMyLocation();
                 List<Address> address = null;
                 if (loc == null) {
-                    loc = enableLocation(true);
-                }
-                if (loc != null) {
-                    Geocoder geocoder = new Geocoder(mActivity, Locale.getDefault());
-                    try {
-                        address = geocoder.getFromLocation(
-                                loc.getLatitude(),
-                                loc.getLongitude(),
-                                1);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-                if (address != null) {
-                    autocompleteStart.setText(address.get(0).getFeatureName());
+                    loc = enableLocation(true, true, autocompleteStart);
                 }
                 autocompleteStart.requestFocus();
             }
@@ -527,7 +513,7 @@ public class MapActivity extends BaseActivity {
     }
 
     @UiThread
-    public void toggleGps(boolean enableGps) {
+    public void toggleGps(boolean enableGps, boolean update, GeocoderAutoCompleteView autoCompleteView) {
         if (enableGps) {
             // Check if user has granted location permission
             if (!locationServices.areLocationPermissionsGranted()) {
@@ -535,14 +521,14 @@ public class MapActivity extends BaseActivity {
                         Manifest.permission.ACCESS_COARSE_LOCATION,
                         Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_LOCATION);
             } else {
-                enableLocation(true);
+                enableLocation(true, update, autoCompleteView);
             }
         } else {
-            enableLocation(false);
+            enableLocation(false, update, autoCompleteView);
         }
     }
 
-    private Location enableLocation(boolean enabled) {
+    private Location enableLocation(boolean enabled, final boolean update, final GeocoderAutoCompleteView autoCompleteStart) {
         final Location[] newLocation = {null};
         if (enabled) {
             locationServices.addLocationListener(new LocationListener() {
@@ -565,6 +551,18 @@ public class MapActivity extends BaseActivity {
                                 .target(new LatLng(location))
                                 .zoom(16)
                                 .build());
+                        if (update) {
+                            Geocoder geocoder = new Geocoder(mActivity, Locale.getDefault());
+                            try {
+                                List<Address> address = geocoder.getFromLocation(
+                                        location.getLatitude(),
+                                        location.getLongitude(),
+                                        1);
+                                autoCompleteStart.setText(address.get(0).getFeatureName());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
                     }
                 }
             });
@@ -586,7 +584,7 @@ public class MapActivity extends BaseActivity {
             case PERMISSIONS_LOCATION: {
                 if (grantResults.length > 0 &&
                         grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    enableLocation(true);
+                    enableLocation(true, false, null);
                 }
             }
         }
