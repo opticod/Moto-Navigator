@@ -228,7 +228,7 @@ public class MapActivity extends BaseActivity {
                     scrollRange = appBarLayout.getTotalScrollRange();
                 }
                 if (scrollRange + verticalOffset == 0) {
-                    collapsingToolbarLayout.setTitle("Choose Destination");
+                    collapsingToolbarLayout.setTitle("Choose Destination...");
                     isShow = true;
                 } else if (isShow) {
                     collapsingToolbarLayout.setTitle(" ");//carefull there should a space between double quote otherwise it wont work
@@ -243,6 +243,8 @@ public class MapActivity extends BaseActivity {
                 appBarLayout.setExpanded(true, true);
             }
         });
+
+        appBarLayout.setExpanded(true, true);
     }
 
     @Override
@@ -256,6 +258,8 @@ public class MapActivity extends BaseActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
+        AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.app_bar_layout);
+        appBarLayout.setExpanded(true, true);
         return super.onOptionsItemSelected(item);
     }
 

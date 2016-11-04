@@ -10,7 +10,8 @@
         android:id="@+id/content_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipToPadding="false"
+        android:layout_marginTop="-24dp"
+        android:clipToPadding="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <com.mapbox.mapboxsdk.maps.MapView
@@ -152,18 +153,20 @@
                         android:weightSum="2">
 
                         <ImageButton
+                            android:id="@+id/get_current_location"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_weight="1"
                             android:background="?attr/selectableItemBackgroundBorderless"
-                            android:src="@drawable/ic_my_location_black_24dp" />
+                            android:src="@drawable/ic_my_location_white_24dp" />
 
                         <ImageButton
+                            android:id="@+id/swap_endpoints"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_weight="1"
                             android:background="?attr/selectableItemBackgroundBorderless"
-                            android:src="@drawable/ic_import_export_black_24dp" />
+                            android:src="@drawable/ic_swap_vert_white_24dp" />
                     </LinearLayout>
                 </LinearLayout>
 
