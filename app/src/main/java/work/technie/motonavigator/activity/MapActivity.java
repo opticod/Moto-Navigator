@@ -1,9 +1,7 @@
 package work.technie.motonavigator.activity;
 
 import android.Manifest;
-import android.animation.ObjectAnimator;
 import android.animation.TypeEvaluator;
-import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.pm.PackageManager;
@@ -27,6 +25,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -140,18 +139,6 @@ public class MapActivity extends BaseActivity {
                     public void onMapClick(@NonNull LatLng point) {
 
                         appBarLayout.setExpanded(false);
-
-                        destination = Position.fromCoordinates(point.getLongitude(), point.getLatitude());
-                        if (markerDestination == null) {
-                            markerDestination = map.addMarker(new MarkerOptions()
-                                    .position(point).title("Destination").setSnippet("Move marker to set the new destination."));
-                        }
-
-                        ValueAnimator markerAnimator = ObjectAnimator.ofObject(markerDestination, "position",
-                                new LatLngEvaluator(), markerDestination.getPosition(), point);
-                        markerAnimator.setDuration(1000);
-                        markerAnimator.start();
-
                     }
                 });
             }
@@ -165,7 +152,7 @@ public class MapActivity extends BaseActivity {
             @Override
             public void OnFeatureClick(GeocodingFeature feature) {
                 Position position = feature.asPosition();
-                updateMap(position.getLatitude(), position.getLongitude());
+                updateMap(position.getLatitude(), position.getLongitude(), true);
             }
         });
 
@@ -177,7 +164,7 @@ public class MapActivity extends BaseActivity {
             @Override
             public void OnFeatureClick(GeocodingFeature feature) {
                 Position position = feature.asPosition();
-                updateMap(position.getLatitude(), position.getLongitude());
+                updateMap(position.getLatitude(), position.getLongitude(), false);
             }
         });
 
@@ -241,9 +228,9 @@ public class MapActivity extends BaseActivity {
             }
         });
 
-/*
-        FloatingActionButton walkDriveActionButton = (FloatingActionButton) findViewById(R.id.walk_toggle_fab);
-        walkDriveActionButton.setOnClickListener(new View.OnClickListener() {
+
+        Button walkPath = (Button) findViewById(R.id.walk);
+        walkPath.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (map != null) {
@@ -256,8 +243,8 @@ public class MapActivity extends BaseActivity {
             }
         });
 
-        FloatingActionButton bikeDriveActionButton = (FloatingActionButton) findViewById(R.id.bike_toggle_fab);
-        bikeDriveActionButton.setOnClickListener(new View.OnClickListener() {
+        Button bikePath = (Button) findViewById(R.id.cycle);
+        bikePath.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (map != null) {
@@ -270,8 +257,8 @@ public class MapActivity extends BaseActivity {
             }
         });
 
-        FloatingActionButton carDriveActionButton = (FloatingActionButton) findViewById(R.id.car_toggle_fab);
-        carDriveActionButton.setOnClickListener(new View.OnClickListener() {
+        Button carPath = (Button) findViewById(R.id.drive);
+        carPath.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (map != null) {
@@ -282,7 +269,7 @@ public class MapActivity extends BaseActivity {
                     }
                 }
             }
-        });*/
+        });
 
         final CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
 
@@ -340,13 +327,20 @@ public class MapActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void updateMap(double latitude, double longitude) {
-
-        if (markerDestination == null) {
-            markerDestination = map.addMarker(new MarkerOptions()
-                    .position(new LatLng(latitude, longitude)).title("Destination").setSnippet("Move marker to set the new destination."));
+    private void updateMap(double latitude, double longitude, boolean isOrigin) {
+        if (!isOrigin) {
+            if (markerDestination == null) {
+                markerDestination = map.addMarker(new MarkerOptions()
+                        .position(new LatLng(latitude, longitude)).title("Destination").setSnippet("Move marker to set the new destination."));
+            }
+            destination = Position.fromCoordinates(longitude, latitude);
+        } else {
+            if (markerOrigin == null) {
+                markerOrigin = map.addMarker(new MarkerOptions()
+                        .position(new LatLng(latitude, longitude)).title("Origin").setSnippet("Move marker to set the new starting position."));
+            }
+            origin = Position.fromCoordinates(longitude, latitude);
         }
-        destination = Position.fromCoordinates(longitude, latitude);
 
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(new LatLng(latitude, longitude))
