@@ -60,7 +60,6 @@ import com.mapbox.services.directions.v5.models.StepManeuver;
 import com.mapbox.services.geocoding.v5.GeocodingCriteria;
 import com.mapbox.services.geocoding.v5.models.GeocodingFeature;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
@@ -121,21 +120,6 @@ public class MapActivity extends BaseActivity {
             @Override
             public void onMapReady(MapboxMap mapboxMap) {
                 map = mapboxMap;
-                Location lastOrigin = locationServices.getLastLocation();
-
-                if (lastOrigin != null) {
-                    origin = Position.fromCoordinates(lastOrigin.getLongitude(), lastOrigin.getLatitude());
-
-                    if (markerOrigin == null) {
-                        IconFactory iconFactory = IconFactory.getInstance(mActivity);
-                        Drawable iconDrawable = ContextCompat.getDrawable(mActivity, R.drawable.default_marker);
-                        Icon icon = iconFactory.fromDrawable(iconDrawable);
-
-                        markerOrigin = map.addMarker(new MarkerOptions()
-                                .position(new LatLng(lastOrigin.getLatitude(), lastOrigin.getLongitude())).title("Origin").icon(icon));
-                    }
-                }
-
                 mapboxMap.setOnMapClickListener(new MapboxMap.OnMapClickListener() {
                     @Override
                     public void onMapClick(@NonNull LatLng point) {
@@ -176,7 +160,7 @@ public class MapActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 if (map != null) {
-                    toggleGps(!map.isMyLocationEnabled(), false, null);
+                    toggleGps(!map.isMyLocationEnabled(), autocompleteStart);
                 }
             }
         });
@@ -186,7 +170,7 @@ public class MapActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 if (map != null) {
-                    toggleGps(!map.isMyLocationEnabled(), false, null);
+                    toggleGps(!map.isMyLocationEnabled(), autocompleteStart);
                 }
             }
         });
@@ -197,9 +181,8 @@ public class MapActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 Location loc = map.getMyLocation();
-                List<Address> address = null;
                 if (loc == null) {
-                    loc = enableLocation(true, true, autocompleteStart);
+                    enableLocation(true, autocompleteStart);
                 }
                 autocompleteStart.requestFocus();
             }
@@ -209,10 +192,30 @@ public class MapActivity extends BaseActivity {
         swapLoc.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String start = autocompleteStart.getText().toString();
-                String destination = autocompleteDestination.getText().toString();
-                autocompleteStart.setText(destination);
-                autocompleteDestination.setText(start);
+                String startStr = autocompleteStart.getText().toString();
+                String destinationStr = autocompleteDestination.getText().toString();
+                autocompleteStart.setText(destinationStr);
+                autocompleteDestination.setText(startStr);
+                Position tmp = origin;
+                origin = destination;
+                destination = tmp;
+                if (routePolyLine != null) {
+                    map.removePolyline(routePolyLine);
+                }
+                if (markerOrigin != null) {
+                    map.removeMarker(markerOrigin);
+                }
+
+                if (markerDestination != null) {
+                    map.removeMarker(markerDestination);
+                }
+
+                markerDestination = map.addMarker(new MarkerOptions()
+                        .position(new LatLng(destination.getLatitude(), destination.getLongitude())).title("Destination"));
+
+                markerOrigin = map.addMarker(new MarkerOptions()
+                        .position(new LatLng(origin.getLatitude(), origin.getLongitude())).title("Origin"));
+
             }
         });
 
@@ -343,17 +346,22 @@ public class MapActivity extends BaseActivity {
     }
 
     private void updateMap(double latitude, double longitude, boolean isOrigin) {
+        if (routePolyLine != null) {
+            map.removePolyline(routePolyLine);
+        }
         if (!isOrigin) {
-            if (markerDestination == null) {
-                markerDestination = map.addMarker(new MarkerOptions()
-                        .position(new LatLng(latitude, longitude)).title("Destination").setSnippet("Move marker to set the new destination."));
+            if (markerDestination != null) {
+                map.removeMarker(markerDestination);
             }
+            markerDestination = map.addMarker(new MarkerOptions()
+                    .position(new LatLng(latitude, longitude)).title("Destination"));
             destination = Position.fromCoordinates(longitude, latitude);
         } else {
-            if (markerOrigin == null) {
-                markerOrigin = map.addMarker(new MarkerOptions()
-                        .position(new LatLng(latitude, longitude)).title("Origin").setSnippet("Move marker to set the new starting position."));
+            if (markerOrigin != null) {
+                map.removeMarker(markerOrigin);
             }
+            markerOrigin = map.addMarker(new MarkerOptions()
+                    .position(new LatLng(latitude, longitude)).title("Origin"));
             origin = Position.fromCoordinates(longitude, latitude);
         }
 
@@ -513,7 +521,7 @@ public class MapActivity extends BaseActivity {
     }
 
     @UiThread
-    public void toggleGps(boolean enableGps, boolean update, GeocoderAutoCompleteView autoCompleteView) {
+    public void toggleGps(boolean enableGps, GeocoderAutoCompleteView autoCompleteView) {
         if (enableGps) {
             // Check if user has granted location permission
             if (!locationServices.areLocationPermissionsGranted()) {
@@ -521,29 +529,36 @@ public class MapActivity extends BaseActivity {
                         Manifest.permission.ACCESS_COARSE_LOCATION,
                         Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_LOCATION);
             } else {
-                enableLocation(true, update, autoCompleteView);
+                enableLocation(true, autoCompleteView);
             }
         } else {
-            enableLocation(false, update, autoCompleteView);
+            enableLocation(false, autoCompleteView);
         }
     }
 
-    private Location enableLocation(boolean enabled, final boolean update, final GeocoderAutoCompleteView autoCompleteStart) {
+    private Location enableLocation(boolean enabled, final GeocoderAutoCompleteView autoCompleteStart) {
         final Location[] newLocation = {null};
+        final FlagGPSOneTime gps = new FlagGPSOneTime();
         if (enabled) {
+            map.setMyLocationEnabled(true);
             locationServices.addLocationListener(new LocationListener() {
                 @Override
                 public void onLocationChanged(Location location) {
-                    if (location != null) {
+                    if (location != null && gps.flag) {
                         newLocation[0] = location;
-                        if (markerOrigin == null) {
+                        if (routePolyLine != null) {
+                            map.removePolyline(routePolyLine);
+                        }
+                        if (markerOrigin != null) {
+                            map.removeMarker(markerOrigin);
+                        }
                             IconFactory iconFactory = IconFactory.getInstance(mActivity);
                             Drawable iconDrawable = ContextCompat.getDrawable(mActivity, R.drawable.default_marker);
                             Icon icon = iconFactory.fromDrawable(iconDrawable);
 
                             markerOrigin = map.addMarker(new MarkerOptions()
                                     .position(new LatLng(location.getLatitude(), location.getLongitude())).title("Origin").icon(icon));
-                        }
+
 
                         markerOrigin.setPosition(new LatLng(location.getLatitude(), location.getLongitude()));
                         origin = Position.fromCoordinates(location.getLongitude(), location.getLatitude());
@@ -551,7 +566,6 @@ public class MapActivity extends BaseActivity {
                                 .target(new LatLng(location))
                                 .zoom(16)
                                 .build());
-                        if (update) {
                             Geocoder geocoder = new Geocoder(mActivity, Locale.getDefault());
                             try {
                                 List<Address> address = geocoder.getFromLocation(
@@ -559,11 +573,13 @@ public class MapActivity extends BaseActivity {
                                         location.getLongitude(),
                                         1);
                                 autoCompleteStart.setText(address.get(0).getFeatureName());
-                            } catch (IOException e) {
+                            } catch (Exception e) {
                                 e.printStackTrace();
                             }
                         }
-                    }
+                    gps.flag = false;
+                    map.setMyLocationEnabled(false);
+
                 }
             });
             floatingActionButtonA.setImageResource(R.drawable.ic_location_disabled_24dp);
@@ -571,9 +587,9 @@ public class MapActivity extends BaseActivity {
         } else {
             floatingActionButtonA.setImageResource(R.drawable.ic_my_location_24dp);
             floatingActionButtonB.setImageResource(R.drawable.ic_my_location_24dp);
+            map.setMyLocationEnabled(false);
         }
         // Enable or disable the location layer on the map
-        map.setMyLocationEnabled(enabled);
         return newLocation[0];
     }
 
@@ -584,7 +600,7 @@ public class MapActivity extends BaseActivity {
             case PERMISSIONS_LOCATION: {
                 if (grantResults.length > 0 &&
                         grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    enableLocation(true, false, null);
+                    enableLocation(true, null);
                 }
             }
         }
@@ -602,6 +618,14 @@ public class MapActivity extends BaseActivity {
             latLng.setLongitude(startValue.getLongitude() +
                     ((endValue.getLongitude() - startValue.getLongitude()) * fraction));
             return latLng;
+        }
+    }
+
+    class FlagGPSOneTime {
+        public boolean flag;
+
+        FlagGPSOneTime() {
+            this.flag = true;
         }
     }
 }
