@@ -29,8 +29,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.Marker;
@@ -107,6 +110,15 @@ public class MapActivity extends BaseActivity {
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseUser user = mAuth.getCurrentUser();
+
+        View hView = navigationView.getHeaderView(0);
+        TextView nav_user_name = (TextView) hView.findViewById(R.id.user_name);
+        nav_user_name.setText(String.format(Locale.ENGLISH, "Welcome %s", user.getDisplayName()));
+        TextView nav_user_email = (TextView) hView.findViewById(R.id.user_email);
+        nav_user_email.setText(user.getEmail());
 
         mActivity = this;
 

@@ -9,9 +9,7 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,7 +25,6 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import work.technie.motonavigator.R;
 import work.technie.motonavigator.auth.AuthActivity;
-import work.technie.motonavigator.fragment.AboutFragment;
 
 /**
  * Created by anupam on 31/10/16.
@@ -47,25 +44,6 @@ public class BaseActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        if (savedInstanceState == null) {
-            currentMenuItemId = R.id.nav_map;
-        } else {
-            currentMenuItemId = savedInstanceState.getInt(STATE_FRAGMENT);
-        }
-
     }
 
     @Override
@@ -104,8 +82,8 @@ public class BaseActivity extends AppCompatActivity
                         .replace(R.id.content_main, new MapFragment(), FRAGMENT_TAG_MAP).commit();
                 if (getSupportActionBar() != null) {
                     getSupportActionBar().setTitle("Map");
-                }
-                navigationView.getMenu().getItem(0).setChecked(true);*/
+                }*/
+                navigationView.getMenu().getItem(0).setChecked(true);
 
                 Intent intent = new Intent(this, MapActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -119,12 +97,12 @@ public class BaseActivity extends AppCompatActivity
                 //Add transaction to settings fragment
                 break;
             case R.id.nav_about:
-                fragmentManager.beginTransaction()
-                        .replace(R.id.content_main, new AboutFragment(), FRAGMENT_TAG_MAP).commit();
+                navigationView.getMenu().getItem(3).setChecked(true);
+                intent = new Intent(this, AboutActivity.class);
+                this.startActivity(intent);
                 if (getSupportActionBar() != null) {
                     getSupportActionBar().setTitle("About");
                 }
-                navigationView.getMenu().getItem(3).setChecked(true);
                 break;
             case R.id.nav_sign_out:
                 signOut();
