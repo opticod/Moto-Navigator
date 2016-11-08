@@ -40,7 +40,9 @@
             android:theme="@style/AppTheme.NoActionBar" />
 
         <service android:name="com.mapbox.mapboxsdk.telemetry.TelemetryService" />
-
+        <provider
+            android:name=".data.MotorProvider"
+            android:authorities="work.technie.motonavigator" />
     </application>
 
 </manifest>
