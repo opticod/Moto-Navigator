@@ -14,7 +14,7 @@ public class MotorProvider extends ContentProvider {
     static final int WAYPOINTS = 100;
     static final int WAYPOINTS_WITH_ID = 101;
     static final int STEPS = 200;
-    static final int STEPS_WITH_ID = 201;
+    static final int STEPS_WITH_ROUTE_ID = 201;
 
     private static final UriMatcher sUriMatcher = buildUriMatcher();
     private MotorDBHelper mOpenHelper;
@@ -28,7 +28,7 @@ public class MotorProvider extends ContentProvider {
         matcher.addURI(authority, MotorContract.PATH_WAYPOINTS + "/*", WAYPOINTS_WITH_ID);
 
         matcher.addURI(authority, MotorContract.PATH_STEPS, STEPS);
-        matcher.addURI(authority, MotorContract.PATH_STEPS + "/*", STEPS_WITH_ID);
+        matcher.addURI(authority, MotorContract.PATH_STEPS + "/*", STEPS_WITH_ROUTE_ID);
 
         return matcher;
     }
@@ -53,7 +53,7 @@ public class MotorProvider extends ContentProvider {
                 return MotorContract.Waypoints.CONTENT_ITEM_TYPE;
             case STEPS:
                 return MotorContract.Steps.CONTENT_TYPE;
-            case STEPS_WITH_ID:
+            case STEPS_WITH_ROUTE_ID:
                 return MotorContract.Steps.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -102,11 +102,11 @@ public class MotorProvider extends ContentProvider {
                 );
                 break;
             }
-            case STEPS_WITH_ID: {
+            case STEPS_WITH_ROUTE_ID: {
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         MotorContract.Steps.TABLE_NAME,
                         projection,
-                        MotorContract.Steps._ID + " = ?",
+                        MotorContract.Steps.ROUTE_ID + " = ?",
                         new String[]{String.valueOf(ContentUris.parseId(uri))},
                         null,
                         null,
@@ -162,9 +162,9 @@ public class MotorProvider extends ContentProvider {
                 rowsDeleted = db.delete(
                         MotorContract.Steps.TABLE_NAME, selection, selectionArgs);
                 break;
-            case STEPS_WITH_ID:
+            case STEPS_WITH_ROUTE_ID:
                 rowsDeleted = db.delete(MotorContract.Steps.TABLE_NAME,
-                        MotorContract.Steps._ID + " = ?",
+                        MotorContract.Steps.ROUTE_ID + " = ?",
                         new String[]{String.valueOf(ContentUris.parseId(uri))});
                 break;
             case WAYPOINTS:
@@ -208,10 +208,10 @@ public class MotorProvider extends ContentProvider {
                 rowsUpdated = db.update(MotorContract.Steps.TABLE_NAME, values, selection,
                         selectionArgs);
                 break;
-            case STEPS_WITH_ID: {
+            case STEPS_WITH_ROUTE_ID: {
                 rowsUpdated = db.update(MotorContract.Steps.TABLE_NAME,
                         values,
-                        MotorContract.Steps._ID + " = ?",
+                        MotorContract.Steps.ROUTE_ID + " = ?",
                         new String[]{String.valueOf(ContentUris.parseId(uri))});
                 break;
             }

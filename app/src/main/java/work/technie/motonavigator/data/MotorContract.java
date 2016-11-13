@@ -23,10 +23,10 @@ public class MotorContract {
         public static final String DEST_NAME = "dest_name";
         public static final String DEST_LAT = "dest_lat";
         public static final String DEST_LONG = "dest_long";
-        public static final String ROUTE_A_ID = "route_a_id";
-        public static final String ROUTE_A_DURATION = "route_a_duration";
-        public static final String ROUTE_B_ID = "route_b_id";
-        public static final String ROUTE_B_DURATION = "route_b_duration";
+        public static final String MODE = "mode";
+        public static final String ROUTE_ID = "route_id";
+        public static final String ROUTE_DURATION = "route_duration";
+        public static final String ROUTE_DISTANCE = "route_distance";
 
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_WAYPOINTS).build();
@@ -60,8 +60,6 @@ public class MotorContract {
 
         public static final String TABLE_NAME = "Steps";
         public static final String ROUTE_ID = "route_id";
-        public static final String DURATION_ROUTE = "duration_route";
-        public static final String DISTANCE_ROUTE = "distance_route";
 
         public static final String BEARING_BEFORE = "bearing_before";
         public static final String BEARING_AFTER = "bearing_after";
@@ -78,17 +76,17 @@ public class MotorContract {
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_STEPS).build();
 
         public static final String CONTENT_TYPE =
-                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_WAYPOINTS;
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_STEPS;
         public static final String CONTENT_ITEM_TYPE =
-                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_WAYPOINTS;
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_STEPS;
 
         public static Uri buildStepsUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
-        //content://work....../steps/stepsId
-        public static Uri buildStepsUriWithStepId(String stepId) {
-            return CONTENT_URI.buildUpon().appendPath(stepId).build();
+        //content://work....../steps/routeId
+        public static Uri buildStepsUriWithRouteId(String routeId) {
+            return CONTENT_URI.buildUpon().appendPath(routeId).build();
         }
 
         public static Uri buildStepUri() {

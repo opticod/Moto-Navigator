@@ -27,16 +27,14 @@ public class MotorDBHelper extends SQLiteOpenHelper {
                 Waypoints.DEST_NAME + "  TEXT," +
                 Waypoints.DEST_LAT + "  TEXT," +
                 Waypoints.DEST_LONG + "  TEXT," +
-                Waypoints.ROUTE_A_ID + "  TEXT," +
-                Waypoints.ROUTE_A_DURATION + "  TEXT," +
-                Waypoints.ROUTE_B_ID + "  TEXT," +
-                Waypoints.ROUTE_B_DURATION + "  TEXT)";
+                Waypoints.MODE + "  TEXT," +
+                Waypoints.ROUTE_ID + "  TEXT," +
+                Waypoints.ROUTE_DURATION + "  TEXT," +
+                Waypoints.ROUTE_DISTANCE + " TEXT)";
 
         final String SQL_CREATE__TABLE_STEPS = "CREATE TABLE " + Steps.TABLE_NAME + " (" +
                 Steps._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                 Steps.ROUTE_ID + "  TEXT," +
-                Steps.DURATION_ROUTE + "  TEXT," +
-                Steps.DISTANCE_ROUTE + "  TEXT," +
                 Steps.BEARING_BEFORE + "  TEXT," +
                 Steps.BEARING_AFTER + "  TEXT," +
                 Steps.LOCATION_LAT + "  TEXT," +

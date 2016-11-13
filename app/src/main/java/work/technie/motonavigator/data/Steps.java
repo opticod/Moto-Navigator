@@ -4,11 +4,26 @@
 
 package work.technie.motonavigator.data;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by anupam on 21/7/16.
  */
-public class Steps {
+public class Steps implements Parcelable {
+    public final Parcelable.Creator<Steps> CREATOR = new Parcelable.Creator<Steps>() {
+        @Override
+        public Steps createFromParcel(Parcel parcel) {
+            return new Steps(parcel);
+        }
 
+        @Override
+        public Steps[] newArray(int size) {
+            return new Steps[size];
+        }
+    };
+
+    private String route_id;
     private String bearing_before;
     private String bearing_after;
     private String location_lat;
@@ -20,7 +35,8 @@ public class Steps {
     private String name;
     private String distance;
 
-    public Steps(String bearing_after, String bearing_before, String location_lat, String location_long, String type, String instruction, String mode, String duration, String name, String distance) {
+    public Steps(String route_id, String bearing_after, String bearing_before, String location_lat, String location_long, String type, String instruction, String mode, String duration, String name, String distance) {
+        this.route_id = route_id;
         this.bearing_after = bearing_after;
         this.bearing_before = bearing_before;
         this.location_lat = location_lat;
@@ -31,6 +47,39 @@ public class Steps {
         this.duration = duration;
         this.name = name;
         this.distance = distance;
+    }
+
+    private Steps(Parcel in) {
+        this.route_id = in.readString();
+        this.bearing_after = in.readString();
+        this.bearing_before = in.readString();
+        this.location_lat = in.readString();
+        this.location_long = in.readString();
+        this.type = in.readString();
+        this.instruction = in.readString();
+        this.mode = in.readString();
+        this.duration = in.readString();
+        this.name = in.readString();
+        this.distance = in.readString();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(route_id);
+        dest.writeString(bearing_after);
+        dest.writeString(bearing_before);
+        dest.writeString(location_lat);
+        dest.writeString(type);
+        dest.writeString(instruction);
+        dest.writeString(mode);
+        dest.writeString(duration);
+        dest.writeString(name);
+        dest.writeString(distance);
     }
 
     public String getBearing_before() {
