@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingBottom="@dimen/padding"
+    android:paddingTop="@dimen/padding"
+    android:weightSum="9">
+
+
+    <ImageView
+        android:id="@+id/mode"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_weight="1"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/type"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_weight="2"
+        android:gravity="center"
+        android:paddingLeft="@dimen/padding"
+        android:paddingRight="@dimen/paddingMed"
+        android:text="TYPE"
+        android:textAppearance="?android:textAppearanceMedium" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="4"
+        android:orientation="vertical"
+        android:weightSum="2">
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:paddingLeft="@dimen/padding"
+            android:paddingRight="@dimen/padding"
+            android:textAppearance="?android:textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/instruction"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingLeft="@dimen/padding"
+            android:paddingRight="@dimen/padding"
+            android:text="Head northeast on MDR	"
+            android:textAppearance="?android:textAppearanceMedium" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:orientation="vertical"
+        android:weightSum="2">
+
+        <TextView
+            android:id="@+id/distance"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="end|center_vertical"
+            android:paddingBottom="@dimen/paddingSmall"
+            android:paddingLeft="@dimen/padding"
+            android:paddingRight="@dimen/paddingMed"
+            android:paddingTop="@dimen/paddingSmall"
+            android:text="2707.8m"
+            android:textAppearance="?android:textAppearanceSmall" />
+
+        <TextView
+            android:id="@+id/duration"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="end|center_vertical"
+            android:paddingBottom="@dimen/paddingSmall"
+            android:paddingLeft="@dimen/padding"
+            android:paddingRight="@dimen/paddingMed"
+            android:paddingTop="@dimen/paddingSmall"
+            android:text="1949.9sec"
+            android:textAppearance="?android:textAppearanceSmall" />
+
+    </LinearLayout>
+</LinearLayout>
