@@ -31,18 +31,14 @@
 
         <activity
             android:name=".activity.BaseActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".activity.MapActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".activity.AboutActivity"
+            android:configChanges="keyboardHidden|orientation"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <service android:name="com.mapbox.mapboxsdk.telemetry.TelemetryService" />
         <provider
             android:name=".data.MotorProvider"
-            android:authorities="work.technie.motonavigator" />
+            android:authorities="work.technie.motonavigator"
+            android:exported="false" />
     </application>
 
 </manifest>
