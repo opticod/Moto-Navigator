@@ -55,7 +55,7 @@ public class LaunchScreenActivity extends Activity {
 
         @Override
         protected void onPostExecute(Void res) {
-            Intent intent = new Intent(LaunchScreenActivity.this, loggedIn ? MapActivity.class : AuthActivity.class);
+            Intent intent = new Intent(LaunchScreenActivity.this, loggedIn ? BaseActivity.class : AuthActivity.class);
             startActivity(intent);
             finish();
         }
