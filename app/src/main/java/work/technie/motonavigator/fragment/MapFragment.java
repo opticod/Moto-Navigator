@@ -1,9 +1,10 @@
-package work.technie.motonavigator.activity;
+package work.technie.motonavigator.fragment;
 
 import android.Manifest;
 import android.animation.TypeEvaluator;
 import android.app.Activity;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
@@ -15,8 +16,8 @@ import android.support.annotation.UiThread;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -24,16 +25,13 @@ import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.Marker;
@@ -57,6 +55,7 @@ import com.mapbox.services.directions.v5.DirectionsCriteria;
 import com.mapbox.services.directions.v5.MapboxDirections;
 import com.mapbox.services.directions.v5.models.DirectionsResponse;
 import com.mapbox.services.directions.v5.models.DirectionsRoute;
+import com.mapbox.services.directions.v5.models.DirectionsWaypoint;
 import com.mapbox.services.directions.v5.models.LegStep;
 import com.mapbox.services.directions.v5.models.RouteLeg;
 import com.mapbox.services.directions.v5.models.StepManeuver;
@@ -71,17 +70,20 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import work.technie.motonavigator.R;
-import work.technie.motonavigator.data.Db;
-import work.technie.motonavigator.data.DbContract;
+import work.technie.motonavigator.data.MotorContract;
+import work.technie.motonavigator.utils.Utility;
 
 /**
- * Created by anupam on 31/10/16.
+ * Created by anupam on 14/11/16.
  */
 
-public class MapActivity extends BaseActivity {
+public class MapFragment extends Fragment {
 
     private final static String TAG = "MapFragment";
     private static final int PERMISSIONS_LOCATION = 0;
+    private static boolean expanded;
+    private static String route_id;
+    private final String FRAGMENT_TAG_REST = "FTAGR";
     FloatingActionButton floatingActionButtonA;
     FloatingActionButton floatingActionButtonB;
     LocationServices locationServices;
@@ -94,39 +96,27 @@ public class MapActivity extends BaseActivity {
     private Position destination;
     private Polyline routePolyLine;
     private Activity mActivity;
+    private View rootView;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_map);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        mActivity = getActivity();
+        rootView = inflater.inflate(R.layout.fragment_map, container, false);
+        Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = (DrawerLayout) mActivity.findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                mActivity, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
 
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        FirebaseUser user = mAuth.getCurrentUser();
+        locationServices = LocationServices.getLocationServices(mActivity);
 
-        View hView = navigationView.getHeaderView(0);
-        TextView nav_user_name = (TextView) hView.findViewById(R.id.user_name);
-        nav_user_name.setText(String.format(Locale.ENGLISH, "Welcome %s", user.getDisplayName()));
-        TextView nav_user_email = (TextView) hView.findViewById(R.id.user_email);
-        nav_user_email.setText(user.getEmail());
-
-        mActivity = this;
-
-        locationServices = LocationServices.getLocationServices(this);
-
-        mapView = (MapView) findViewById(R.id.mapView);
+        mapView = (MapView) rootView.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
-        final AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.app_bar_layout);
+        final AppBarLayout appBarLayout = (AppBarLayout) rootView.findViewById(R.id.app_bar_layout);
 
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
@@ -136,6 +126,7 @@ public class MapActivity extends BaseActivity {
                     @Override
                     public void onMapClick(@NonNull LatLng point) {
 
+                        expanded = false;
                         appBarLayout.setExpanded(false);
                     }
                 });
@@ -143,7 +134,7 @@ public class MapActivity extends BaseActivity {
         });
 
 
-        final GeocoderAutoCompleteView autocompleteStart = (GeocoderAutoCompleteView) findViewById(R.id.query_start);
+        final GeocoderAutoCompleteView autocompleteStart = (GeocoderAutoCompleteView) rootView.findViewById(R.id.query_start);
         autocompleteStart.setAccessToken(getString(R.string.PUBLIC_TOKEN));
         autocompleteStart.setType(GeocodingCriteria.TYPE_POI);
         autocompleteStart.setOnFeatureListener(new GeocoderAutoCompleteView.OnFeatureListener() {
@@ -155,7 +146,7 @@ public class MapActivity extends BaseActivity {
         });
 
 
-        final GeocoderAutoCompleteView autocompleteDestination = (GeocoderAutoCompleteView) findViewById(R.id.query_destination);
+        final GeocoderAutoCompleteView autocompleteDestination = (GeocoderAutoCompleteView) rootView.findViewById(R.id.query_destination);
         autocompleteDestination.setAccessToken(getString(R.string.PUBLIC_TOKEN));
         autocompleteDestination.setType(GeocodingCriteria.TYPE_POI);
         autocompleteDestination.setOnFeatureListener(new GeocoderAutoCompleteView.OnFeatureListener() {
@@ -167,40 +158,59 @@ public class MapActivity extends BaseActivity {
         });
 
 
-        floatingActionButtonA = (FloatingActionButton) findViewById(R.id.location_toggle_fab1);
+        floatingActionButtonA = (FloatingActionButton) rootView.findViewById(R.id.location_toggle_fab1);
         floatingActionButtonA.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (map != null) {
-                    toggleGps(!map.isMyLocationEnabled(), autocompleteStart);
+                if (Utility.hasNetworkConnection(mActivity)) {
+                    if (map != null) {
+                        toggleGps(!map.isMyLocationEnabled(), autocompleteStart);
+                    }
+                } else {
+                    Toast.makeText(mActivity, "Network Unavailable! Please try later!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
-        floatingActionButtonB = (FloatingActionButton) findViewById(R.id.location_toggle_fab2);
+        floatingActionButtonB = (FloatingActionButton) rootView.findViewById(R.id.location_toggle_fab2);
         floatingActionButtonB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (map != null) {
-                    toggleGps(!map.isMyLocationEnabled(), autocompleteStart);
+                if (Utility.hasNetworkConnection(mActivity)) {
+                    if (map != null) {
+                        toggleGps(!map.isMyLocationEnabled(), autocompleteStart);
+                    }
+                } else {
+                    Toast.makeText(mActivity, "Network Unavailable! Please try later!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
-        ImageButton getCurrentLoc = (ImageButton) findViewById(R.id.get_current_location);
+
+        if (!Utility.hasNetworkConnection(mActivity)) {
+            Toast.makeText(mActivity, "Network Unavailable! Some feature may not work properly!", Toast.LENGTH_LONG).show();
+        }
+
+        ImageButton getCurrentLoc = (ImageButton) rootView.findViewById(R.id.get_current_location);
 
         getCurrentLoc.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Location loc = map.getMyLocation();
                 if (loc == null) {
-                    enableLocation(true, autocompleteStart);
+                    if (!locationServices.areLocationPermissionsGranted()) {
+                        ActivityCompat.requestPermissions(mActivity, new String[]{
+                                Manifest.permission.ACCESS_COARSE_LOCATION,
+                                Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_LOCATION);
+                    } else {
+                        enableLocation(true, autocompleteStart);
+                    }
                 }
                 autocompleteStart.requestFocus();
             }
         });
 
-        ImageButton swapLoc = (ImageButton) findViewById(R.id.swap_endpoints);
+        ImageButton swapLoc = (ImageButton) rootView.findViewById(R.id.swap_endpoints);
         swapLoc.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -231,59 +241,80 @@ public class MapActivity extends BaseActivity {
             }
         });
 
-        Button walkPath = (Button) findViewById(R.id.walk);
+        Button walkPath = (Button) rootView.findViewById(R.id.walk);
         walkPath.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (map != null) {
-                    try {
-                        if (validateForm(autocompleteStart, autocompleteDestination)) {
-                            getRoute(origin, destination, DirectionsCriteria.PROFILE_WALKING);
+                if (Utility.hasNetworkConnection(mActivity)) {
+                    if (map != null) {
+                        try {
+                            if (validateForm(autocompleteStart, autocompleteDestination)) {
+                                getRoute(origin, destination, DirectionsCriteria.PROFILE_WALKING);
+                            }
+                        } catch (ServicesException e) {
+                            e.printStackTrace();
                         }
-                    } catch (ServicesException e) {
-                        e.printStackTrace();
                     }
+                } else {
+                    Toast.makeText(mActivity, "Network Unavailable! Please try later!", Toast.LENGTH_SHORT).show();
                 }
+
             }
         });
 
-        Button bikePath = (Button) findViewById(R.id.cycle);
+        Button bikePath = (Button) rootView.findViewById(R.id.cycle);
         bikePath.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (map != null) {
-                    try {
-                        if (validateForm(autocompleteStart, autocompleteDestination)) {
-                            getRoute(origin, destination, DirectionsCriteria.PROFILE_CYCLING);
+                if (Utility.hasNetworkConnection(mActivity)) {
+                    if (map != null) {
+
+                        try {
+                            if (validateForm(autocompleteStart, autocompleteDestination)) {
+                                getRoute(origin, destination, DirectionsCriteria.PROFILE_CYCLING);
+                            }
+                        } catch (ServicesException e) {
+                            e.printStackTrace();
                         }
-                    } catch (ServicesException e) {
-                        e.printStackTrace();
                     }
+                } else {
+                    Toast.makeText(mActivity, "Network Unavailable! Please try later!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
-        Button carPath = (Button) findViewById(R.id.drive);
+        Button carPath = (Button) rootView.findViewById(R.id.drive);
         carPath.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (map != null) {
-                    try {
-                        if (validateForm(autocompleteStart, autocompleteDestination)) {
-                            getRoute(origin, destination, DirectionsCriteria.PROFILE_DRIVING);
+                if (Utility.hasNetworkConnection(mActivity)) {
+                    if (map != null) {
+
+                        try {
+                            if (validateForm(autocompleteStart, autocompleteDestination)) {
+                                getRoute(origin, destination, DirectionsCriteria.PROFILE_DRIVING);
+                            }
+                        } catch (ServicesException e) {
+                            e.printStackTrace();
                         }
-                    } catch (ServicesException e) {
-                        e.printStackTrace();
                     }
+                } else {
+                    Toast.makeText(mActivity, "Network Unavailable! Please try later!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
-        final CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        final CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) rootView.findViewById(R.id.collapsing_toolbar);
 
         collapsingToolbarLayout.setTitle(" ");
-        findViewById(R.id.location_toggle_fab1).setVisibility(View.VISIBLE);
-        findViewById(R.id.location_toggle_fab2).setVisibility(View.INVISIBLE);
+        rootView.findViewById(R.id.location_toggle_fab1).setVisibility(View.VISIBLE);
+        rootView.findViewById(R.id.location_toggle_fab2).setVisibility(View.INVISIBLE);
+
+
+        if (routePolyLine == null) {
+            rootView.findViewById(R.id.drive_toggle_fab1).setVisibility(View.INVISIBLE);
+            rootView.findViewById(R.id.drive_toggle_fab2).setVisibility(View.INVISIBLE);
+        }
 
         appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             boolean isShow = false;
@@ -295,16 +326,28 @@ public class MapActivity extends BaseActivity {
                     scrollRange = appBarLayout.getTotalScrollRange();
                 }
                 if (scrollRange + verticalOffset == 0) {
+                    expanded = false;
                     collapsingToolbarLayout.setTitle("Choose Destination...");
                     floatingActionButtonA.setVisibility(View.INVISIBLE);
                     floatingActionButtonB.setVisibility(View.VISIBLE);
+
+                    if (routePolyLine != null) {
+                        rootView.findViewById(R.id.drive_toggle_fab1).setVisibility(View.INVISIBLE);
+                        rootView.findViewById(R.id.drive_toggle_fab2).setVisibility(View.VISIBLE);
+                    }
+
                     isShow = true;
                 } else if (isShow) {
-                    collapsingToolbarLayout.setTitle(" ");//carefull there should a space between double quote otherwise it wont work
+                    expanded = true;
+                    collapsingToolbarLayout.setTitle(" ");
                     isShow = false;
                     floatingActionButtonA.setVisibility(View.VISIBLE);
                     floatingActionButtonB.setVisibility(View.INVISIBLE);
 
+                    if (routePolyLine != null) {
+                        rootView.findViewById(R.id.drive_toggle_fab1).setVisibility(View.VISIBLE);
+                        rootView.findViewById(R.id.drive_toggle_fab2).setVisibility(View.INVISIBLE);
+                    }
                 }
             }
         });
@@ -312,13 +355,55 @@ public class MapActivity extends BaseActivity {
         toolbar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                expanded = true;
                 appBarLayout.setExpanded(true, true);
             }
         });
 
+        expanded = true;
         appBarLayout.setExpanded(true, true);
         floatingActionButtonA.setVisibility(View.VISIBLE);
         floatingActionButtonB.setVisibility(View.INVISIBLE);
+
+        rootView.findViewById(R.id.drive_toggle_fab1).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                autocompleteStart.clearFocus();
+                autocompleteDestination.clearFocus();
+                Bundle arguments = new Bundle();
+                arguments.putString(Intent.EXTRA_TEXT, route_id);
+
+                DriveFragment fragment = new DriveFragment();
+                fragment.setArguments(arguments);
+
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .addToBackStack("back")
+                        .add(R.id.frag_container, fragment, FRAGMENT_TAG_REST)
+                        .commit();
+            }
+        });
+
+        rootView.findViewById(R.id.drive_toggle_fab2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                autocompleteStart.clearFocus();
+                autocompleteDestination.clearFocus();
+                Bundle arguments = new Bundle();
+                arguments.putString(Intent.EXTRA_TEXT, route_id);
+
+                DriveFragment fragment = new DriveFragment();
+                fragment.setArguments(arguments);
+
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .addToBackStack("back")
+                        .add(R.id.frag_container, fragment, FRAGMENT_TAG_REST)
+                        .commit();
+            }
+        });
+
+        return rootView;
     }
 
     private boolean validateForm(GeocoderAutoCompleteView autocompleteStart, GeocoderAutoCompleteView autoCompleteDestination) {
@@ -341,20 +426,6 @@ public class MapActivity extends BaseActivity {
         }
 
         return valid;
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        return super.onOptionsItemSelected(item);
     }
 
     private void updateMap(double latitude, double longitude, boolean isOrigin) {
@@ -384,7 +455,7 @@ public class MapActivity extends BaseActivity {
         map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 5000, null);
     }
 
-    private void getRoute(Position origin, Position destination, final String profile) throws ServicesException {
+    private void getRoute(final Position origin, final Position destination, final String profile) throws ServicesException {
 
         if (null == origin) {
             Log.e(TAG, "Origin empty");
@@ -418,49 +489,98 @@ public class MapActivity extends BaseActivity {
                     return;
                 }
 
-
-                RouteLeg mLeg = response.body().getRoutes().get(0).getLegs().get(0);
-
-                ContentValues mRoute = new ContentValues();
-                mRoute.put(DbContract.Route.DISTANCE, String.valueOf(mLeg.getDistance()));
-                mRoute.put(DbContract.Route.DURATION, String.valueOf(mLeg.getDuration()));
-
-                Vector<ContentValues> cVVectorSteps = new Vector<>();
-                for (LegStep mSteps : mLeg.getSteps()) {
-
-                    ContentValues steps = new ContentValues();
-                    StepManeuver maneuver = mSteps.getManeuver();
-                    steps.put(DbContract.Steps.BEARING_BEFORE, String.valueOf(maneuver.getBearingBefore()));
-                    steps.put(DbContract.Steps.BEARING_AFTER, String.valueOf(maneuver.getBearingAfter()));
-                    steps.put(DbContract.Steps.LOCATION_LAT, String.valueOf(maneuver.getLocation()[1]));
-                    steps.put(DbContract.Steps.LOCATION_LONG, String.valueOf(maneuver.getLocation()[0]));
-                    steps.put(DbContract.Steps.TYPE, maneuver.getType());
-                    steps.put(DbContract.Steps.INSTRUCTION, maneuver.getInstruction());
-                    steps.put(DbContract.Steps.MODE, mSteps.getMode());
-                    steps.put(DbContract.Steps.DURATION, String.valueOf(mSteps.getDuration()));
-                    steps.put(DbContract.Steps.NAME, mSteps.getName());
-                    steps.put(DbContract.Steps.DISTANCE, String.valueOf(mSteps.getDistance()));
-
-                    cVVectorSteps.add(steps);
+                if (expanded) {
+                    rootView.findViewById(R.id.drive_toggle_fab1).setVisibility(View.VISIBLE);
+                    rootView.findViewById(R.id.drive_toggle_fab2).setVisibility(View.INVISIBLE);
+                } else {
+                    rootView.findViewById(R.id.drive_toggle_fab1).setVisibility(View.INVISIBLE);
+                    rootView.findViewById(R.id.drive_toggle_fab2).setVisibility(View.VISIBLE);
                 }
-                if (cVVectorSteps.size() > 0) {
-                    ContentValues[] cvArray = new ContentValues[cVVectorSteps.size()];
-                    cVVectorSteps.toArray(cvArray);
-                    Db db = new Db(mActivity);
-                    db.open();
-                    db.clearDatabaseTable(DbContract.Steps.TABLE_NAME);
-                    db.clearDatabaseTable(DbContract.Route.TABLE_NAME);
-                    db.bulkInsertRouteSteps(mRoute, cvArray);
-                    db.close();
+                try {
+
+                    List<DirectionsWaypoint> mDirectionWaypoint = response.body().getWaypoints();
+                    List<DirectionsRoute> mDirectionRoute = response.body().getRoutes();
+
+                    ContentValues mWaypoint = new ContentValues();
+                    Vector<ContentValues> cVVectorSteps = new Vector<>();
+
+                    Geocoder geocoder = new Geocoder(mActivity, Locale.getDefault());
+
+                    long ROUTE_ID = System.currentTimeMillis();
+                    route_id = String.valueOf(ROUTE_ID);
+
+                    try {
+                        List<Address> address = geocoder.getFromLocation(
+                                origin.getLatitude(),
+                                origin.getLongitude(),
+                                1);
+                        mWaypoint.put(MotorContract.Waypoints.START_NAME, address.get(0).getFeatureName());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        List<Address> address = geocoder.getFromLocation(
+                                destination.getLatitude(),
+                                destination.getLongitude(),
+                                1);
+                        mWaypoint.put(MotorContract.Waypoints.DEST_NAME, address.get(0).getFeatureName());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    mWaypoint.put(MotorContract.Waypoints.START_LONG, String.valueOf(mDirectionWaypoint.get(0).getLocation()[0]));
+                    mWaypoint.put(MotorContract.Waypoints.START_LAT, String.valueOf(mDirectionWaypoint.get(0).getLocation()[1]));
+                    mWaypoint.put(MotorContract.Waypoints.DEST_LONG, String.valueOf(mDirectionWaypoint.get(1).getLocation()[0]));
+                    mWaypoint.put(MotorContract.Waypoints.DEST_LAT, String.valueOf(mDirectionWaypoint.get(1).getLocation()[1]));
+                    mWaypoint.put(MotorContract.Waypoints.MODE, profile);
+
+                    if (mDirectionRoute.size() > 0) {
+                        mWaypoint.put(MotorContract.Waypoints.ROUTE_ID, String.valueOf(ROUTE_ID));
+                        mWaypoint.put(MotorContract.Waypoints.ROUTE_DURATION, String.valueOf(mDirectionRoute.get(0).getDuration()));
+                        mWaypoint.put(MotorContract.Waypoints.ROUTE_DISTANCE, String.valueOf(mDirectionRoute.get(0).getDistance()));
+
+
+                        RouteLeg mLeg = response.body().getRoutes().get(0).getLegs().get(0);
+
+                        for (LegStep mSteps : mLeg.getSteps()) {
+
+                            ContentValues steps = new ContentValues();
+                            StepManeuver maneuver = mSteps.getManeuver();
+                            steps.put(MotorContract.Steps.ROUTE_ID, String.valueOf(ROUTE_ID));
+                            steps.put(MotorContract.Steps.BEARING_BEFORE, String.valueOf(maneuver.getBearingBefore()));
+                            steps.put(MotorContract.Steps.BEARING_AFTER, String.valueOf(maneuver.getBearingAfter()));
+                            steps.put(MotorContract.Steps.LOCATION_LAT, String.valueOf(maneuver.getLocation()[1]));
+                            steps.put(MotorContract.Steps.LOCATION_LONG, String.valueOf(maneuver.getLocation()[0]));
+                            steps.put(MotorContract.Steps.TYPE, maneuver.getType());
+                            steps.put(MotorContract.Steps.INSTRUCTION, maneuver.getInstruction());
+                            steps.put(MotorContract.Steps.MODE, mSteps.getMode());
+                            steps.put(MotorContract.Steps.DURATION, String.valueOf(mSteps.getDuration()));
+                            steps.put(MotorContract.Steps.NAME, mSteps.getName());
+                            steps.put(MotorContract.Steps.DISTANCE, String.valueOf(mSteps.getDistance()));
+
+                            cVVectorSteps.add(steps);
+                        }
+                    }
+
+                    int inserted = 0;
+
+                    if (cVVectorSteps.size() > 0) {
+                        ContentValues[] cvArray = new ContentValues[cVVectorSteps.size()];
+                        cVVectorSteps.toArray(cvArray);
+                        inserted = mActivity.getContentResolver().bulkInsert(MotorContract.Steps.CONTENT_URI, cvArray);
+                    }
+                    mActivity.getContentResolver().insert(MotorContract.Waypoints.CONTENT_URI, mWaypoint);
+
+                    // Print some info about the route
+                    currentRoute = response.body().getRoutes().get(0);
+                    Log.d(TAG, "Inserted: " + inserted);
+                    Log.d(TAG, "Distance: " + currentRoute.getDistance() + " " + currentRoute.getLegs().size());
+                    Toast.makeText(mActivity, "Route is " + currentRoute.getDistance() + " meters long.", Toast.LENGTH_SHORT).show();
+
+                    // Draw the route on the map
+                    drawRoute(currentRoute, profile);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-
-                // Print some info about the route
-                currentRoute = response.body().getRoutes().get(0);
-                Log.d(TAG, "Distance: " + currentRoute.getDistance() + " " + currentRoute.getLegs().size());
-                Toast.makeText(mActivity, "Route is " + currentRoute.getDistance() + " meters long.", Toast.LENGTH_SHORT).show();
-
-                // Draw the route on the map
-                drawRoute(currentRoute, profile);
             }
 
             @Override
@@ -516,8 +636,8 @@ public class MapActivity extends BaseActivity {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
         mapView.onSaveInstanceState(outState);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -564,12 +684,12 @@ public class MapActivity extends BaseActivity {
                         if (markerOrigin != null) {
                             map.removeMarker(markerOrigin);
                         }
-                            IconFactory iconFactory = IconFactory.getInstance(mActivity);
-                            Drawable iconDrawable = ContextCompat.getDrawable(mActivity, R.drawable.default_marker);
-                            Icon icon = iconFactory.fromDrawable(iconDrawable);
+                        IconFactory iconFactory = IconFactory.getInstance(mActivity);
+                        Drawable iconDrawable = ContextCompat.getDrawable(mActivity, R.drawable.default_marker);
+                        Icon icon = iconFactory.fromDrawable(iconDrawable);
 
-                            markerOrigin = map.addMarker(new MarkerOptions()
-                                    .position(new LatLng(location.getLatitude(), location.getLongitude())).title("Origin").icon(icon));
+                        markerOrigin = map.addMarker(new MarkerOptions()
+                                .position(new LatLng(location.getLatitude(), location.getLongitude())).title("Origin").icon(icon));
 
 
                         markerOrigin.setPosition(new LatLng(location.getLatitude(), location.getLongitude()));
@@ -578,17 +698,17 @@ public class MapActivity extends BaseActivity {
                                 .target(new LatLng(location))
                                 .zoom(16)
                                 .build());
-                            Geocoder geocoder = new Geocoder(mActivity, Locale.getDefault());
-                            try {
-                                List<Address> address = geocoder.getFromLocation(
-                                        location.getLatitude(),
-                                        location.getLongitude(),
-                                        1);
-                                autoCompleteStart.setText(address.get(0).getFeatureName());
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+                        Geocoder geocoder = new Geocoder(mActivity, Locale.getDefault());
+                        try {
+                            List<Address> address = geocoder.getFromLocation(
+                                    location.getLatitude(),
+                                    location.getLongitude(),
+                                    1);
+                            autoCompleteStart.setText(address.get(0).getFeatureName());
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
+                    }
                     gps.flag = false;
                     map.setMyLocationEnabled(false);
 
