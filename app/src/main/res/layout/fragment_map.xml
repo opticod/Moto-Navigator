@@ -88,7 +88,6 @@
                 android:fitsSystemWindows="true"
                 android:orientation="vertical"
                 android:paddingRight="16dp"
-                android:paddingTop="16dp"
                 android:scaleType="centerCrop"
                 android:weightSum="5"
                 app:layout_collapseMode="parallax">
