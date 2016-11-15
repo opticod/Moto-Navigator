@@ -70,6 +70,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import work.technie.motonavigator.R;
+import work.technie.motonavigator.data.MapData;
 import work.technie.motonavigator.data.MotorContract;
 import work.technie.motonavigator.utils.Utility;
 
@@ -89,6 +90,7 @@ public class MapFragment extends Fragment {
     LocationServices locationServices;
     private MapView mapView;
     private MapboxMap map;
+    private String mode;
     private DirectionsRoute currentRoute;
     private Marker markerDestination;
     private Marker markerOrigin;
@@ -110,6 +112,32 @@ public class MapFragment extends Fragment {
                 mActivity, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
+        setRetainInstance(true);
+
+        final GeocoderAutoCompleteView autocompleteStart = (GeocoderAutoCompleteView) rootView.findViewById(R.id.query_start);
+        autocompleteStart.setAccessToken(getString(R.string.PUBLIC_TOKEN));
+        autocompleteStart.setType(GeocodingCriteria.TYPE_POI);
+        autocompleteStart.setOnFeatureListener(new GeocoderAutoCompleteView.OnFeatureListener() {
+            @Override
+            public void OnFeatureClick(GeocodingFeature feature) {
+                Position position = feature.asPosition();
+                updateMap(position.getLatitude(), position.getLongitude(), true);
+            }
+        });
+
+
+        final GeocoderAutoCompleteView autocompleteDestination = (GeocoderAutoCompleteView) rootView.findViewById(R.id.query_destination);
+        autocompleteDestination.setAccessToken(getString(R.string.PUBLIC_TOKEN));
+        autocompleteDestination.setType(GeocodingCriteria.TYPE_POI);
+        autocompleteDestination.setOnFeatureListener(new GeocoderAutoCompleteView.OnFeatureListener() {
+            @Override
+            public void OnFeatureClick(GeocodingFeature feature) {
+                Position position = feature.asPosition();
+                updateMap(position.getLatitude(), position.getLongitude(), false);
+            }
+        });
+
+
 
 
         locationServices = LocationServices.getLocationServices(mActivity);
@@ -134,28 +162,7 @@ public class MapFragment extends Fragment {
         });
 
 
-        final GeocoderAutoCompleteView autocompleteStart = (GeocoderAutoCompleteView) rootView.findViewById(R.id.query_start);
-        autocompleteStart.setAccessToken(getString(R.string.PUBLIC_TOKEN));
-        autocompleteStart.setType(GeocodingCriteria.TYPE_POI);
-        autocompleteStart.setOnFeatureListener(new GeocoderAutoCompleteView.OnFeatureListener() {
-            @Override
-            public void OnFeatureClick(GeocodingFeature feature) {
-                Position position = feature.asPosition();
-                updateMap(position.getLatitude(), position.getLongitude(), true);
-            }
-        });
 
-
-        final GeocoderAutoCompleteView autocompleteDestination = (GeocoderAutoCompleteView) rootView.findViewById(R.id.query_destination);
-        autocompleteDestination.setAccessToken(getString(R.string.PUBLIC_TOKEN));
-        autocompleteDestination.setType(GeocodingCriteria.TYPE_POI);
-        autocompleteDestination.setOnFeatureListener(new GeocoderAutoCompleteView.OnFeatureListener() {
-            @Override
-            public void OnFeatureClick(GeocodingFeature feature) {
-                Position position = feature.asPosition();
-                updateMap(position.getLatitude(), position.getLongitude(), false);
-            }
-        });
 
 
         floatingActionButtonA = (FloatingActionButton) rootView.findViewById(R.id.location_toggle_fab1);
@@ -249,7 +256,7 @@ public class MapFragment extends Fragment {
                     if (map != null) {
                         try {
                             if (validateForm(autocompleteStart, autocompleteDestination)) {
-                                getRoute(origin, destination, DirectionsCriteria.PROFILE_WALKING);
+                                getRoute(origin, destination, DirectionsCriteria.PROFILE_WALKING, true);
                             }
                         } catch (ServicesException e) {
                             e.printStackTrace();
@@ -271,7 +278,7 @@ public class MapFragment extends Fragment {
 
                         try {
                             if (validateForm(autocompleteStart, autocompleteDestination)) {
-                                getRoute(origin, destination, DirectionsCriteria.PROFILE_CYCLING);
+                                getRoute(origin, destination, DirectionsCriteria.PROFILE_CYCLING, true);
                             }
                         } catch (ServicesException e) {
                             e.printStackTrace();
@@ -292,7 +299,7 @@ public class MapFragment extends Fragment {
 
                         try {
                             if (validateForm(autocompleteStart, autocompleteDestination)) {
-                                getRoute(origin, destination, DirectionsCriteria.PROFILE_DRIVING);
+                                getRoute(origin, destination, DirectionsCriteria.PROFILE_DRIVING, true);
                             }
                         } catch (ServicesException e) {
                             e.printStackTrace();
@@ -314,6 +321,12 @@ public class MapFragment extends Fragment {
         if (routePolyLine == null) {
             rootView.findViewById(R.id.drive_toggle_fab1).setVisibility(View.INVISIBLE);
             rootView.findViewById(R.id.drive_toggle_fab2).setVisibility(View.INVISIBLE);
+        } else if (expanded) {
+            rootView.findViewById(R.id.drive_toggle_fab1).setVisibility(View.VISIBLE);
+            rootView.findViewById(R.id.drive_toggle_fab2).setVisibility(View.INVISIBLE);
+        } else {
+            rootView.findViewById(R.id.drive_toggle_fab1).setVisibility(View.INVISIBLE);
+            rootView.findViewById(R.id.drive_toggle_fab2).setVisibility(View.VISIBLE);
         }
 
         appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
@@ -403,6 +416,28 @@ public class MapFragment extends Fragment {
             }
         });
 
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey("mapData")) {
+                MapData mapData = savedInstanceState.getParcelable("mapData");
+                if (mapData != null) {
+                    if (mapData.getStart_lat() != 0) {
+                        updateMap(mapData.getStart_lat(), mapData.getStart_long(), true);
+                    }
+                    if (mapData.getDest_lat() != 0) {
+                        updateMap(mapData.getDest_lat(), mapData.getDest_long(), false);
+                    }
+                    if (mapData.getPolyLine() == 1) {
+                        try {
+                            getRoute(origin, destination, mapData.getMode(), false);
+                        } catch (ServicesException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                }
+            }
+        }
+
         return rootView;
     }
 
@@ -439,6 +474,7 @@ public class MapFragment extends Fragment {
             markerDestination = map.addMarker(new MarkerOptions()
                     .position(new LatLng(latitude, longitude)).title("Destination"));
             destination = Position.fromCoordinates(longitude, latitude);
+            map.updateMarker(markerDestination);
         } else {
             if (markerOrigin != null) {
                 map.removeMarker(markerOrigin);
@@ -446,6 +482,7 @@ public class MapFragment extends Fragment {
             markerOrigin = map.addMarker(new MarkerOptions()
                     .position(new LatLng(latitude, longitude)).title("Origin"));
             origin = Position.fromCoordinates(longitude, latitude);
+            map.updateMarker(markerOrigin);
         }
 
         CameraPosition cameraPosition = new CameraPosition.Builder()
@@ -455,7 +492,7 @@ public class MapFragment extends Fragment {
         map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 5000, null);
     }
 
-    private void getRoute(final Position origin, final Position destination, final String profile) throws ServicesException {
+    private void getRoute(final Position origin, final Position destination, final String profile, final boolean info) throws ServicesException {
 
         if (null == origin) {
             Log.e(TAG, "Origin empty");
@@ -488,7 +525,7 @@ public class MapFragment extends Fragment {
                     Log.e(TAG, "No routes found, make sure you set the right user and access token.");
                     return;
                 }
-
+                mode = profile;
                 if (expanded) {
                     rootView.findViewById(R.id.drive_toggle_fab1).setVisibility(View.VISIBLE);
                     rootView.findViewById(R.id.drive_toggle_fab2).setVisibility(View.INVISIBLE);
@@ -574,8 +611,9 @@ public class MapFragment extends Fragment {
                     currentRoute = response.body().getRoutes().get(0);
                     Log.d(TAG, "Inserted: " + inserted);
                     Log.d(TAG, "Distance: " + currentRoute.getDistance() + " " + currentRoute.getLegs().size());
-                    Toast.makeText(mActivity, "Route is " + currentRoute.getDistance() + " meters long.", Toast.LENGTH_SHORT).show();
-
+                    if (info) {
+                        Toast.makeText(mActivity, "Route is " + currentRoute.getDistance() + " meters long.", Toast.LENGTH_SHORT).show();
+                    }
                     // Draw the route on the map
                     drawRoute(currentRoute, profile);
                 } catch (Exception e) {
@@ -636,6 +674,8 @@ public class MapFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
+        MapData mapData = new MapData(origin != null ? origin.getLatitude() : 0, origin != null ? origin.getLongitude() : 0, destination != null ? destination.getLatitude() : 0, destination != null ? destination.getLongitude() : 0, mode, markerOrigin != null ? 1 : 0, markerDestination != null ? 1 : 0, routePolyLine != null ? 1 : 0);
+        outState.putParcelable("mapData", mapData);
         mapView.onSaveInstanceState(outState);
         super.onSaveInstanceState(outState);
     }
