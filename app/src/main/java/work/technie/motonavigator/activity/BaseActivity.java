@@ -11,8 +11,9 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
@@ -22,9 +23,16 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
+import java.util.Locale;
 
 import work.technie.motonavigator.R;
 import work.technie.motonavigator.auth.AuthActivity;
+import work.technie.motonavigator.fragment.AboutFragment;
+import work.technie.motonavigator.fragment.DriveCollectionFragment;
+import work.technie.motonavigator.fragment.DriveFragment;
+import work.technie.motonavigator.fragment.MapFragment;
 
 /**
  * Created by anupam on 31/10/16.
@@ -32,7 +40,7 @@ import work.technie.motonavigator.auth.AuthActivity;
 
 public class BaseActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        GoogleApiClient.OnConnectionFailedListener {
+        GoogleApiClient.OnConnectionFailedListener, DriveCollectionFragment.Callback {
 
     private static final String FRAGMENT_TAG_MAP = "MAP_FRAGMENT";
     private final static String STATE_FRAGMENT = "stateFragment";
@@ -44,65 +52,86 @@ public class BaseActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseUser user = mAuth.getCurrentUser();
+
+        View hView = navigationView.getHeaderView(0);
+        TextView nav_user_name = (TextView) hView.findViewById(R.id.user_name);
+        nav_user_name.setText(String.format(Locale.ENGLISH, "Welcome %s", user != null ? user.getDisplayName() : null));
+        TextView nav_user_email = (TextView) hView.findViewById(R.id.user_email);
+        nav_user_email.setText(user != null ? user.getEmail() : null);
+
+        if (savedInstanceState == null) {
+            currentMenuItemId = R.id.nav_map;
+            navigationView.getMenu().getItem(0).setChecked(true);
+        } else {
+            currentMenuItemId = savedInstanceState.getInt(STATE_FRAGMENT);
+        }
+
+        if (getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG_MAP) == null && getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG_REST) == null) {
+            doMenuAction(currentMenuItemId);
+        }
     }
 
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+                getSupportFragmentManager().popBackStack();
+                return;
+            } else {
+                finish();
+            }
         }
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        return super.onOptionsItemSelected(item);
+        switch (id) {
+            case android.R.id.home:
+                FragmentManager fm = getSupportFragmentManager();
+                if (fm.getBackStackEntryCount() > 0) {
+                    fm.popBackStack();
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void doMenuAction(int menuItemId) {
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         FragmentManager fragmentManager = getSupportFragmentManager();
         switch (menuItemId) {
             case R.id.nav_map:
-                /*
-                fragmentManager.beginTransaction()
-                        .replace(R.id.content_main, new MapFragment(), FRAGMENT_TAG_MAP).commit();
-                if (getSupportActionBar() != null) {
-                    getSupportActionBar().setTitle("Map");
-                }*/
-                navigationView.getMenu().getItem(0).setChecked(true);
 
-                Intent intent = new Intent(this, MapActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                this.startActivity(intent);
+                fragmentManager.beginTransaction()
+                        .replace(R.id.frag_container, new MapFragment(), FRAGMENT_TAG_MAP).commit();
 
                 break;
             case R.id.nav_directions:
-                //Add transaction to navigation fragment
+
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.frag_container, new DriveCollectionFragment(), FRAGMENT_TAG_REST)
+                        .commit();
+
                 break;
             case R.id.nav_settings:
                 //Add transaction to settings fragment
                 break;
             case R.id.nav_about:
-                navigationView.getMenu().getItem(3).setChecked(true);
-                intent = new Intent(this, AboutActivity.class);
-                this.startActivity(intent);
-                if (getSupportActionBar() != null) {
-                    getSupportActionBar().setTitle("About");
-                }
+
+                fragmentManager.beginTransaction()
+                        .replace(R.id.frag_container, new AboutFragment(), FRAGMENT_TAG_REST).commit();
+
                 break;
             case R.id.nav_sign_out:
                 signOut();
@@ -194,5 +223,19 @@ public class BaseActivity extends AppCompatActivity
         // be available.
         Log.d(TAG, "onConnectionFailed:" + connectionResult);
         Toast.makeText(this, "Google Play Services error.", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onItemSelected(String route_id) {
+        Bundle arguments = new Bundle();
+        arguments.putString(Intent.EXTRA_TEXT, route_id);
+
+        DriveFragment fragment = new DriveFragment();
+        fragment.setArguments(arguments);
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.frag_container, fragment, FRAGMENT_TAG_REST)
+                .addToBackStack("back")
+                .commit();
     }
 }
