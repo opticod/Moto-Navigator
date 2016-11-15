@@ -3,9 +3,6 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
-    <color name="floatWalk">#66FF00</color>
-    <color name="floatBike">#03C03C</color>
-    <color name="floatCar">#006400</color>
     <color name="polyWalk">#66FF00</color>
     <color name="polyBike">#03C03C</color>
     <color name="polyCar">#006400</color>
