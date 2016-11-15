@@ -1,5 +1,4 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/main_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/grey_100"
@@ -13,7 +12,6 @@
         android:orientation="vertical">
 
         <ImageView
-            android:id="@+id/google_icon"
             style="@style/ThemeOverlay.FirebaseIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -22,7 +20,6 @@
             android:src="@mipmap/ic_launcher" />
 
         <TextView
-            android:id="@+id/title_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/title_bottom_margin"
@@ -64,7 +61,6 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/email_password_buttons"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/email_password_fields"
