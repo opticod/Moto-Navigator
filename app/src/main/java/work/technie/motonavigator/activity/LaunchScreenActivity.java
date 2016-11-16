@@ -26,10 +26,10 @@ public class LaunchScreenActivity extends Activity {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
-            Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+            Log.d(TAG, getString(R.string.onAuthStateChanges_signed_in) + user.getUid());
             new Wait(true).execute();
         } else {
-            Log.d(TAG, "onAuthStateChanged:signed_out");
+            Log.d(TAG, getString(R.string.onAuthStateChanges_sign_out));
             new Wait(false).execute();
         }
 

@@ -66,7 +66,7 @@ public class DriveFragment extends Fragment implements LoaderManager.LoaderCallb
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putParcelableArrayList("dirList", dirList);
+        outState.putParcelableArrayList(getString(R.string.dir_list), dirList);
         if (mPosition != ListView.INVALID_POSITION) {
             outState.putInt(SELECTED_KEY, mPosition);
         }
@@ -82,7 +82,7 @@ public class DriveFragment extends Fragment implements LoaderManager.LoaderCallb
         }
         View rootView = inflater.inflate(R.layout.fragment_nav, container, false);
         Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
-        toolbar.setTitle("Directions");
+        toolbar.setTitle(R.string.directions);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -91,10 +91,10 @@ public class DriveFragment extends Fragment implements LoaderManager.LoaderCallb
         listViewDir = (ListView) rootView.findViewById(R.id.listview_dir);
         listViewDir.setAdapter(directionListAdapter);
 
-        if (savedInstanceState == null || !savedInstanceState.containsKey("dirList")) {
+        if (savedInstanceState == null || !savedInstanceState.containsKey(getString(R.string.dir_list))) {
             dirList = new ArrayList<>();
         } else {
-            dirList = savedInstanceState.getParcelableArrayList("dirList");
+            dirList = savedInstanceState.getParcelableArrayList(getString(R.string.dir_list));
         }
 
         return rootView;

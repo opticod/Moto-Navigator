@@ -58,20 +58,20 @@ public class DirectionCollectionAdapter extends CursorAdapter {
         viewHolder.dest_name.setText(firstCapital(DEST_NAME));
 
         MODE = MODE.toLowerCase();
-        viewHolder.mode.setImageDrawable(ContextCompat.getDrawable(context, MODE.equals("cycling") ? R.drawable.ic_directions_bike_black_24dp : (MODE.equals("driving") ? R.drawable.ic_drive_eta_black_24dp : R.drawable.ic_directions_walk_black_24dp)));
+        viewHolder.mode.setImageDrawable(ContextCompat.getDrawable(context, MODE.equals(context.getString(R.string.cycling)) ? R.drawable.ic_directions_bike_black_24dp : (MODE.equals(context.getString(R.string.driving)) ? R.drawable.ic_drive_eta_black_24dp : R.drawable.ic_directions_walk_black_24dp)));
 
         if (ROUTE_DISTANCE >= 500) {
             ROUTE_DISTANCE /= 1000;
-            viewHolder.distance.setText(String.format(Locale.US, "%.2f km", ROUTE_DISTANCE));
+            viewHolder.distance.setText(String.format(Locale.US, "%.2f" + context.getString(R.string.km), ROUTE_DISTANCE));
         } else {
-            viewHolder.distance.setText(String.format(Locale.US, "%.0f m", ROUTE_DISTANCE));
+            viewHolder.distance.setText(String.format(Locale.US, "%.0f" + context.getString(R.string.m), ROUTE_DISTANCE));
         }
         if (ROUTE_DURATION >= 60) {
             int min = (int) Math.floor(ROUTE_DURATION / 60);
             int sec = (int) (ROUTE_DURATION - min * 60);
-            viewHolder.duration.setText(String.format(Locale.US, "%d min %d sec", min, sec));
+            viewHolder.duration.setText(String.format(Locale.US, "%d " + context.getString(R.string.min) + " %d" + context.getString(R.string.sec), min, sec));
         } else {
-            viewHolder.duration.setText(String.format(Locale.US, "%d sec", (int) ROUTE_DURATION));
+            viewHolder.duration.setText(String.format(Locale.US, "%d" + context.getString(R.string.sec), (int) ROUTE_DURATION));
         }
 
     }

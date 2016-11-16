@@ -72,7 +72,7 @@ public class NavWidgetRemoteViewsService extends RemoteViewsService {
                 }
                 Uri uri = MotorContract.Waypoints.buildWaypointUri();
                 Cursor cursor = getApplicationContext().getContentResolver().query(uri, WAYPOINTS_COLUMNS, null, null, null);
-                String[] columns = new String[]{"mode", "start_name", "end_name", "route_id"};
+                String[] columns = new String[]{getString(R.string.mode), getString(R.string.start_name), getString(R.string.end_name), getString(R.string.route_id)};
                 data = new MatrixCursor(columns);
                 if (cursor != null) {
                     cursor.moveToFirst();
@@ -115,15 +115,15 @@ public class NavWidgetRemoteViewsService extends RemoteViewsService {
                 RemoteViews views = new RemoteViews(getPackageName(),
                         R.layout.widget_list_item);
 
-                if (mode.equalsIgnoreCase("driving")) {
+                if (mode.equalsIgnoreCase(getString(R.string.driving))) {
                     views.setViewVisibility(R.id.modeCar, View.VISIBLE);
                     views.setViewVisibility(R.id.modeBike, View.GONE);
                     views.setViewVisibility(R.id.modeWalk, View.GONE);
-                } else if (mode.equalsIgnoreCase("cycling")) {
+                } else if (mode.equalsIgnoreCase(getString(R.string.cycling))) {
                     views.setViewVisibility(R.id.modeCar, View.GONE);
                     views.setViewVisibility(R.id.modeBike, View.VISIBLE);
                     views.setViewVisibility(R.id.modeWalk, View.GONE);
-                } else if (mode.equalsIgnoreCase("walking")) {
+                } else if (mode.equalsIgnoreCase(getString(R.string.walking))) {
                     views.setViewVisibility(R.id.modeCar, View.GONE);
                     views.setViewVisibility(R.id.modeBike, View.GONE);
                     views.setViewVisibility(R.id.modeWalk, View.VISIBLE);
@@ -133,7 +133,7 @@ public class NavWidgetRemoteViewsService extends RemoteViewsService {
                 views.setTextViewText(R.id.dest_name, dest_name);
 
                 final Intent fillInIntent = new Intent();
-                fillInIntent.putExtra("route_id", route_id);
+                fillInIntent.putExtra(getString(R.string.route_id), route_id);
                 views.setOnClickFillInIntent(R.id.widget_list_item, fillInIntent);
                 return views;
             }

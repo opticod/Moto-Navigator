@@ -80,20 +80,20 @@ public class DirectionAdapter extends CursorAdapter {
         viewHolder.instruction.setText(firstCapital(STEPS_INSTRUCTION));
         if (null != viewHolder.mode) {
             STEPS_MODE = STEPS_MODE.toLowerCase();
-            viewHolder.mode.setImageDrawable(ContextCompat.getDrawable(context, STEPS_MODE.equals("cycling") ? R.drawable.ic_directions_bike_black_24dp : (STEPS_MODE.equals("driving") ? R.drawable.ic_drive_eta_black_24dp : R.drawable.ic_directions_walk_black_24dp)));
+            viewHolder.mode.setImageDrawable(ContextCompat.getDrawable(context, STEPS_MODE.equals(context.getString(R.string.cycling)) ? R.drawable.ic_directions_bike_black_24dp : (STEPS_MODE.equals(context.getString(R.string.driving)) ? R.drawable.ic_drive_eta_black_24dp : R.drawable.ic_directions_walk_black_24dp)));
         }
         if (STEPS_DISTANCE >= 500) {
             STEPS_DISTANCE /= 1000;
-            viewHolder.distance.setText(String.format(Locale.US, "%.2f km", STEPS_DISTANCE));
+            viewHolder.distance.setText(String.format(Locale.US, "%.2f" + context.getString(R.string.km), STEPS_DISTANCE));
         } else {
-            viewHolder.distance.setText(String.format(Locale.US, "%.0f m", STEPS_DISTANCE));
+            viewHolder.distance.setText(String.format(Locale.US, "%.0f" + context.getString(R.string.m), STEPS_DISTANCE));
         }
         if (STEPS_DURATION >= 60) {
             int min = (int) Math.floor(STEPS_DURATION / 60);
             int sec = (int) (STEPS_DURATION - min * 60);
-            viewHolder.duration.setText(String.format(Locale.US, "%d min %d sec", min, sec));
+            viewHolder.duration.setText(String.format(Locale.US, "%d " + context.getString(R.string.min) + " %d" + context.getString(R.string.sec), min, sec));
         } else {
-            viewHolder.duration.setText(String.format(Locale.US, "%d sec", (int) STEPS_DURATION));
+            viewHolder.duration.setText(String.format(Locale.US, "%d" + context.getString(R.string.sec), (int) STEPS_DURATION));
         }
 
     }

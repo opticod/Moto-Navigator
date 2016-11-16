@@ -18,7 +18,6 @@ import work.technie.motonavigator.R;
 
 public class AboutFragment extends Fragment {
 
-    private final static String TAG = "AboutFragment";
     private Activity mActivity;
     private View rootView;
 

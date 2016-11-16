@@ -98,9 +98,9 @@ public class AuthActivity extends BaseActivity implements
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
-                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+                    Log.d(TAG, getString(R.string.onAuthStateChanges_signed_in) + user.getUid());
                 } else {
-                    Log.d(TAG, "onAuthStateChanged:signed_out");
+                    Log.d(TAG, getString(R.string.onAuthStateChanges_sign_out));
                 }
             }
         };
@@ -115,14 +115,14 @@ public class AuthActivity extends BaseActivity implements
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        Log.d(TAG, "signInAnonymously:onComplete:" + task.isSuccessful());
+                        Log.d(TAG, getString(R.string.signInAnonym_complete) + task.isSuccessful());
 
                         // If sign in fails, display a message to the user. If sign in succeeds
                         // the auth state listener will be notified and logic to handle the
                         // signed in user can be handled in the listener.
                         if (!task.isSuccessful()) {
-                            Log.w(TAG, "signInAnonymously", task.getException());
-                            Toast.makeText(AuthActivity.this, "Authentication failed.",
+                            Log.w(TAG, getString(R.string.signInAnonym), task.getException());
+                            Toast.makeText(AuthActivity.this, R.string.authentication_failed,
                                     Toast.LENGTH_SHORT).show();
                         }
 
@@ -131,7 +131,7 @@ public class AuthActivity extends BaseActivity implements
 
                         SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
                         SharedPreferences.Editor editor = sharedPref.edit();
-                        editor.putInt("LOGIN_MODE", ANONYMOUS_SIGN_IN);
+                        editor.putInt(getString(R.string.login_mode), ANONYMOUS_SIGN_IN);
                         editor.apply();
 
                         Intent intent = new Intent(mActivity, work.technie.motonavigator.activity.BaseActivity.class);
@@ -172,7 +172,7 @@ public class AuthActivity extends BaseActivity implements
 
                 SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putInt("LOGIN_MODE", GOOGLE_SIGN_IN);
+                editor.putInt(getString(R.string.login_mode), GOOGLE_SIGN_IN);
                 editor.apply();
 
                 Intent intent = new Intent(this, work.technie.motonavigator.activity.BaseActivity.class);
@@ -188,7 +188,7 @@ public class AuthActivity extends BaseActivity implements
     }
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
-        Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
+        Log.d(TAG, getString(R.string.firebase_google) + acct.getId());
         showProgressDialog();
 
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
@@ -196,14 +196,14 @@ public class AuthActivity extends BaseActivity implements
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        Log.d(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
+                        Log.d(TAG, getString(R.string.signInWithCredential_complete) + task.isSuccessful());
 
                         // If sign in fails, display a message to the user. If sign in succeeds
                         // the auth state listener will be notified and logic to handle the
                         // signed in user can be handled in the listener.
                         if (!task.isSuccessful()) {
-                            Log.w(TAG, "signInWithCredential", task.getException());
-                            Toast.makeText(AuthActivity.this, "Authentication failed.",
+                            Log.w(TAG, getString(R.string.signInWithCredential), task.getException());
+                            Toast.makeText(AuthActivity.this, getString(R.string.authentication_failed),
                                     Toast.LENGTH_SHORT).show();
                         }
                         // [START_EXCLUDE]
@@ -246,8 +246,8 @@ public class AuthActivity extends BaseActivity implements
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         // An unresolvable error has occurred and Google APIs (including Sign-In) will not
         // be available.
-        Log.d(TAG, "onConnectionFailed:" + connectionResult);
-        Toast.makeText(this, "Google Play Services error.", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, getString(R.string.connection_failed) + connectionResult);
+        Toast.makeText(this, R.string.google_play_error, Toast.LENGTH_SHORT).show();
     }
 
     private boolean validateForm() {
@@ -255,7 +255,7 @@ public class AuthActivity extends BaseActivity implements
 
         String email = mEmailField.getText().toString();
         if (TextUtils.isEmpty(email)) {
-            mEmailField.setError("Required.");
+            mEmailField.setError(getString(R.string.required));
             valid = false;
         } else {
             mEmailField.setError(null);
@@ -263,7 +263,7 @@ public class AuthActivity extends BaseActivity implements
 
         String password = mPasswordField.getText().toString();
         if (TextUtils.isEmpty(password)) {
-            mPasswordField.setError("Required.");
+            mPasswordField.setError(getString(R.string.required));
             valid = false;
         } else {
             mPasswordField.setError(null);
@@ -273,7 +273,7 @@ public class AuthActivity extends BaseActivity implements
     }
 
     private void createAccount(String email, String password) {
-        Log.d(TAG, "createAccount:" + email);
+        Log.d(TAG, getString(R.string.createAccount) + email);
         if (!validateForm()) {
             return;
         }
@@ -287,7 +287,7 @@ public class AuthActivity extends BaseActivity implements
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        Log.d(TAG, "createUserWithEmail:onComplete:" + task.isSuccessful());
+                        Log.d(TAG, getString(R.string.createUserWithEmail_complete) + task.isSuccessful());
 
                         // If sign in fails, display a message to the user. If sign in succeeds
                         // the auth state listener will be notified and logic to handle the
@@ -299,7 +299,7 @@ public class AuthActivity extends BaseActivity implements
 
                             SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
                             SharedPreferences.Editor editor = sharedPref.edit();
-                            editor.putInt("LOGIN_MODE", EMAIL_PASSWORD_SIGN_IN);
+                            editor.putInt(getString(R.string.login_mode), EMAIL_PASSWORD_SIGN_IN);
                             editor.apply();
 
                             Intent intent = new Intent(mActivity, work.technie.motonavigator.activity.BaseActivity.class);
@@ -316,7 +316,7 @@ public class AuthActivity extends BaseActivity implements
     }
 
     private void signInEmail(String email, String password) {
-        Log.d(TAG, "signIn:" + email);
+        Log.d(TAG, getString(R.string.sign_in) + email);
         if (!validateForm()) {
             return;
         }
@@ -329,13 +329,13 @@ public class AuthActivity extends BaseActivity implements
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
+                        Log.d(TAG, getString(R.string.signEmail_complete) + task.isSuccessful());
 
                         // If sign in fails, display a message to the user. If sign in succeeds
                         // the auth state listener will be notified and logic to handle the
                         // signed in user can be handled in the listener.
                         if (!task.isSuccessful()) {
-                            Log.w(TAG, "signInWithEmail:failed", task.getException());
+                            Log.w(TAG, getString(R.string.signEmail_failed), task.getException());
                             Toast.makeText(AuthActivity.this, R.string.auth_failed,
                                     Toast.LENGTH_SHORT).show();
                         }
@@ -346,7 +346,7 @@ public class AuthActivity extends BaseActivity implements
                         } else {
                             SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
                             SharedPreferences.Editor editor = sharedPref.edit();
-                            editor.putInt("LOGIN_MODE", EMAIL_PASSWORD_SIGN_IN);
+                            editor.putInt(getString(R.string.login_mode), EMAIL_PASSWORD_SIGN_IN);
                             editor.apply();
 
                             Intent intent = new Intent(mActivity, work.technie.motonavigator.activity.BaseActivity.class);

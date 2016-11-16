@@ -218,10 +218,10 @@ public class MapFragment extends Fragment {
                 }
 
                 markerDestination = map.addMarker(new MarkerOptions()
-                        .position(new LatLng(destination.getLatitude(), destination.getLongitude())).title("Destination"));
+                        .position(new LatLng(destination.getLatitude(), destination.getLongitude())).title(getString(R.string.destination)));
 
                 markerOrigin = map.addMarker(new MarkerOptions()
-                        .position(new LatLng(origin.getLatitude(), origin.getLongitude())).title("Origin"));
+                        .position(new LatLng(origin.getLatitude(), origin.getLongitude())).title(getString(R.string.origin)));
 
             }
         });
@@ -342,15 +342,15 @@ public class MapFragment extends Fragment {
                 fragment.setArguments(arguments);
 
                 getActivity().getSupportFragmentManager().beginTransaction()
-                        .addToBackStack("back")
+                        .addToBackStack(getString(R.string.back))
                         .add(R.id.frag_container, fragment, FRAGMENT_TAG_REST)
                         .commit();
             }
         });
 
         if (savedInstanceState != null) {
-            if (savedInstanceState.containsKey("mapData")) {
-                MapData mapData = savedInstanceState.getParcelable("mapData");
+            if (savedInstanceState.containsKey(getString(R.string.map_data))) {
+                MapData mapData = savedInstanceState.getParcelable(getString(R.string.map_data));
                 if (mapData != null) {
                     if (mapData.getStart_lat() != 0) {
                         updateMap(mapData.getStart_lat(), mapData.getStart_long(), true);
@@ -378,7 +378,7 @@ public class MapFragment extends Fragment {
 
         String origin = autocompleteStart.getText().toString();
         if (TextUtils.isEmpty(origin)) {
-            autocompleteStart.setError(Html.fromHtml("<font color='Red'>Required.</font>"));
+            autocompleteStart.setError(Html.fromHtml("<font color='Red'>" + getString(R.string.required) + "</font>"));
             valid = false;
         } else {
             autocompleteStart.setError(null);
@@ -386,7 +386,7 @@ public class MapFragment extends Fragment {
 
         String destination = autoCompleteDestination.getText().toString();
         if (TextUtils.isEmpty(destination)) {
-            autoCompleteDestination.setError(Html.fromHtml("<font color='Red'>Required.</font>"));
+            autoCompleteDestination.setError(Html.fromHtml("<font color='Red'>" + getString(R.string.required) + "</font>"));
             valid = false;
         } else {
             autoCompleteDestination.setError(null);
@@ -404,7 +404,7 @@ public class MapFragment extends Fragment {
                 map.removeMarker(markerDestination);
             }
             markerDestination = map.addMarker(new MarkerOptions()
-                    .position(new LatLng(latitude, longitude)).title("Destination"));
+                    .position(new LatLng(latitude, longitude)).title(getString(R.string.destination)));
             destination = Position.fromCoordinates(longitude, latitude);
             map.updateMarker(markerDestination);
         } else {
@@ -412,7 +412,7 @@ public class MapFragment extends Fragment {
                 map.removeMarker(markerOrigin);
             }
             markerOrigin = map.addMarker(new MarkerOptions()
-                    .position(new LatLng(latitude, longitude)).title("Origin"));
+                    .position(new LatLng(latitude, longitude)).title(getString(R.string.origin)));
             origin = Position.fromCoordinates(longitude, latitude);
             map.updateMarker(markerOrigin);
         }
@@ -427,12 +427,12 @@ public class MapFragment extends Fragment {
     private void getRoute(final Position origin, final Position destination, final String profile, final boolean info) throws ServicesException {
 
         if (null == origin) {
-            Log.e(TAG, "Origin empty");
+            Log.e(TAG, getString(R.string.origin_empty));
             Toast.makeText(mActivity, R.string.set_origin, Toast.LENGTH_SHORT).show();
             return;
         }
         if (null == destination) {
-            Log.e(TAG, "Destination empty");
+            Log.e(TAG, getString(R.string.destination_empty));
             Toast.makeText(mActivity, R.string.set_dest, Toast.LENGTH_SHORT).show();
             return;
         }
@@ -452,9 +452,9 @@ public class MapFragment extends Fragment {
             @Override
             public void onResponse(Call<DirectionsResponse> call, Response<DirectionsResponse> response) {
                 // You can get the generic HTTP info about the response
-                Log.d(TAG, "Response code: " + response.code());
+                Log.d(TAG, getString(R.string.response_code) + response.code());
                 if (response.body() == null) {
-                    Log.e(TAG, "No routes found, make sure you set the right user and access token.");
+                    Log.e(TAG, getString(R.string.route_error));
                     return;
                 }
                 mode = profile;
@@ -537,15 +537,13 @@ public class MapFragment extends Fragment {
 
                     // Print some info about the route
                     currentRoute = response.body().getRoutes().get(0);
-                    Log.d(TAG, "Inserted: " + inserted);
-                    Log.d(TAG, "Distance: " + currentRoute.getDistance() + " " + currentRoute.getLegs().size());
                     if (info) {
                         double distance = currentRoute.getDistance();
                         if (distance > 1000) {
                             distance /= 1000;
-                            Toast.makeText(mActivity, String.format(Locale.US, "Route is %.2f km long.", distance), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mActivity, String.format(Locale.US, getString(R.string.route_is) + "%.2f " + getString(R.string.km_long), distance), Toast.LENGTH_SHORT).show();
                         } else {
-                            Toast.makeText(mActivity, String.format(Locale.US, "Route is %.2f m long.", currentRoute.getDistance()), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mActivity, String.format(Locale.US, getString(R.string.route_is) + "%.2f " + getString(R.string.m_long), currentRoute.getDistance()), Toast.LENGTH_SHORT).show();
                         }
                     }
                     // Draw the route on the map
@@ -557,8 +555,8 @@ public class MapFragment extends Fragment {
 
             @Override
             public void onFailure(Call<DirectionsResponse> call, Throwable t) {
-                Log.e(TAG, "Error: " + t.getMessage());
-                Toast.makeText(mActivity, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e(TAG, getString(R.string.error) + t.getMessage());
+                Toast.makeText(mActivity, getString(R.string.error) + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -609,7 +607,7 @@ public class MapFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         MapData mapData = new MapData(origin != null ? origin.getLatitude() : 0, origin != null ? origin.getLongitude() : 0, destination != null ? destination.getLatitude() : 0, destination != null ? destination.getLongitude() : 0, mode, markerOrigin != null ? 1 : 0, markerDestination != null ? 1 : 0, routePolyLine != null ? 1 : 0);
-        outState.putParcelable("mapData", mapData);
+        outState.putParcelable(getString(R.string.map_data), mapData);
         mapView.onSaveInstanceState(outState);
         super.onSaveInstanceState(outState);
     }
@@ -663,7 +661,7 @@ public class MapFragment extends Fragment {
                         Icon icon = iconFactory.fromDrawable(iconDrawable);
 
                         markerOrigin = map.addMarker(new MarkerOptions()
-                                .position(new LatLng(location.getLatitude(), location.getLongitude())).title("Origin").icon(icon));
+                                .position(new LatLng(location.getLatitude(), location.getLongitude())).title(getString(R.string.origin)).icon(icon));
 
 
                         markerOrigin.setPosition(new LatLng(location.getLatitude(), location.getLongitude()));

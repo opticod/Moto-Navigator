@@ -74,7 +74,7 @@ public class DriveCollectionFragment extends Fragment implements LoaderManager.L
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putParcelableArrayList("dirCollectionList", dirCollectionList);
+        outState.putParcelableArrayList(getString(R.string.dir_collection_list), dirCollectionList);
         if (mPosition != ListView.INVALID_POSITION) {
             outState.putInt(SELECTED_KEY, mPosition);
         }
@@ -102,10 +102,10 @@ public class DriveCollectionFragment extends Fragment implements LoaderManager.L
         listViewDirCollection.setAdapter(directionCollectionAdapter);
         listViewDirCollection.setEmptyView(rootView.findViewById(R.id.emptyElement));
 
-        if (savedInstanceState == null || !savedInstanceState.containsKey("dirCollectionList")) {
+        if (savedInstanceState == null || !savedInstanceState.containsKey(getString(R.string.dir_collection_list))) {
             dirCollectionList = new ArrayList<>();
         } else {
-            dirCollectionList = savedInstanceState.getParcelableArrayList("dirCollectionList");
+            dirCollectionList = savedInstanceState.getParcelableArrayList(getString(R.string.dir_collection_list));
         }
 
         listViewDirCollection.setOnItemClickListener(new AdapterView.OnItemClickListener() {

@@ -61,7 +61,7 @@ public class BaseActivity extends AppCompatActivity
 
         View hView = navigationView.getHeaderView(0);
         TextView nav_user_name = (TextView) hView.findViewById(R.id.user_name);
-        nav_user_name.setText(String.format(Locale.ENGLISH, "Welcome %s", user != null ? user.getDisplayName() : null));
+        nav_user_name.setText(String.format(Locale.ENGLISH, getString(R.string.welcome) + " %s", user != null ? user.getDisplayName() : null));
         TextView nav_user_email = (TextView) hView.findViewById(R.id.user_email);
         nav_user_email.setText(user != null ? user.getEmail() : null);
 
@@ -74,7 +74,7 @@ public class BaseActivity extends AppCompatActivity
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            String routeId = extras.getString("route_id");
+            String routeId = extras.getString(getString(R.string.route_id));
             Bundle arguments = new Bundle();
             arguments.putString(Intent.EXTRA_TEXT, routeId);
 
@@ -162,7 +162,7 @@ public class BaseActivity extends AppCompatActivity
         mAuth.signOut();
 
         SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
-        int SIGN_IN_MODE = sharedPref.getInt("LOGIN_MODE", -1);
+        int SIGN_IN_MODE = sharedPref.getInt(getString(R.string.login_mode), -1);
         // Google sign out
         switch (SIGN_IN_MODE) {
             case -1:
@@ -201,7 +201,7 @@ public class BaseActivity extends AppCompatActivity
         }
 
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putInt("LOGIN_MODE", -1);
+        editor.putInt(getString(R.string.login_mode), -1);
         editor.apply();
 
         Intent intent = new Intent(this, AuthActivity.class);
@@ -234,8 +234,8 @@ public class BaseActivity extends AppCompatActivity
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         // An unresolvable error has occurred and Google APIs (including Sign-In) will not
         // be available.
-        Log.d(TAG, "onConnectionFailed:" + connectionResult);
-        Toast.makeText(this, "Google Play Services error.", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, getString(R.string.connection_failed) + connectionResult);
+        Toast.makeText(this, getString(R.string.google_play_error), Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -248,7 +248,7 @@ public class BaseActivity extends AppCompatActivity
 
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.frag_container, fragment, FRAGMENT_TAG_REST)
-                .addToBackStack("back")
+                .addToBackStack(getString(R.string.back))
                 .commit();
     }
 }
