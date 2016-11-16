@@ -83,11 +83,9 @@ public class MapFragment extends Fragment {
 
     private final static String TAG = "MapFragment";
     private static final int PERMISSIONS_LOCATION = 0;
-    private static boolean expanded;
     private static String route_id;
     private final String FRAGMENT_TAG_REST = "FTAGR";
-    FloatingActionButton floatingActionButtonA;
-    FloatingActionButton floatingActionButtonB;
+    FloatingActionButton floatingActionButton;
     LocationServices locationServices;
     private MapView mapView;
     private MapboxMap map;
@@ -152,19 +150,16 @@ public class MapFragment extends Fragment {
                     @Override
                     public void onMapClick(@NonNull LatLng point) {
 
-                        expanded = false;
                         appBarLayout.setExpanded(false);
                     }
                 });
             }
         });
 
+        rootView.findViewById(R.id.buttons).bringToFront();
 
-
-
-
-        floatingActionButtonA = (FloatingActionButton) rootView.findViewById(R.id.location_toggle_fab1);
-        floatingActionButtonA.setOnClickListener(new View.OnClickListener() {
+        floatingActionButton = (FloatingActionButton) rootView.findViewById(R.id.location_toggle_fab);
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (Utility.hasNetworkConnection(mActivity)) {
@@ -176,21 +171,6 @@ public class MapFragment extends Fragment {
                 }
             }
         });
-
-        floatingActionButtonB = (FloatingActionButton) rootView.findViewById(R.id.location_toggle_fab2);
-        floatingActionButtonB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (Utility.hasNetworkConnection(mActivity)) {
-                    if (map != null) {
-                        toggleGps(!map.isMyLocationEnabled(), autocompleteStart);
-                    }
-                } else {
-                    Toast.makeText(mActivity, R.string.network_unavailable, Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
 
         if (!Utility.hasNetworkConnection(mActivity)) {
             Toast.makeText(mActivity, R.string.network_info, Toast.LENGTH_LONG).show();
@@ -312,19 +292,11 @@ public class MapFragment extends Fragment {
         final CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) rootView.findViewById(R.id.collapsing_toolbar);
 
         collapsingToolbarLayout.setTitle(" ");
-        rootView.findViewById(R.id.location_toggle_fab1).setVisibility(View.VISIBLE);
-        rootView.findViewById(R.id.location_toggle_fab2).setVisibility(View.INVISIBLE);
-
 
         if (routePolyLine == null) {
-            rootView.findViewById(R.id.drive_toggle_fab1).setVisibility(View.INVISIBLE);
-            rootView.findViewById(R.id.drive_toggle_fab2).setVisibility(View.INVISIBLE);
-        } else if (expanded) {
-            rootView.findViewById(R.id.drive_toggle_fab1).setVisibility(View.VISIBLE);
-            rootView.findViewById(R.id.drive_toggle_fab2).setVisibility(View.INVISIBLE);
+            rootView.findViewById(R.id.drive_toggle_fab).setVisibility(View.INVISIBLE);
         } else {
-            rootView.findViewById(R.id.drive_toggle_fab1).setVisibility(View.INVISIBLE);
-            rootView.findViewById(R.id.drive_toggle_fab2).setVisibility(View.VISIBLE);
+            rootView.findViewById(R.id.drive_toggle_fab).setVisibility(View.VISIBLE);
         }
 
         appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
@@ -337,28 +309,12 @@ public class MapFragment extends Fragment {
                     scrollRange = appBarLayout.getTotalScrollRange();
                 }
                 if (scrollRange + verticalOffset == 0) {
-                    expanded = false;
                     collapsingToolbarLayout.setTitle(getString(R.string.choose_dest));
-                    floatingActionButtonA.setVisibility(View.INVISIBLE);
-                    floatingActionButtonB.setVisibility(View.VISIBLE);
-
-                    if (routePolyLine != null) {
-                        rootView.findViewById(R.id.drive_toggle_fab1).setVisibility(View.INVISIBLE);
-                        rootView.findViewById(R.id.drive_toggle_fab2).setVisibility(View.VISIBLE);
-                    }
 
                     isShow = true;
                 } else if (isShow) {
-                    expanded = true;
                     collapsingToolbarLayout.setTitle(" ");
                     isShow = false;
-                    floatingActionButtonA.setVisibility(View.VISIBLE);
-                    floatingActionButtonB.setVisibility(View.INVISIBLE);
-
-                    if (routePolyLine != null) {
-                        rootView.findViewById(R.id.drive_toggle_fab1).setVisibility(View.VISIBLE);
-                        rootView.findViewById(R.id.drive_toggle_fab2).setVisibility(View.INVISIBLE);
-                    }
                 }
             }
         });
@@ -366,39 +322,17 @@ public class MapFragment extends Fragment {
         toolbar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                expanded = true;
                 appBarLayout.setExpanded(true, true);
             }
         });
 
-        expanded = true;
         appBarLayout.setExpanded(true, true);
-        floatingActionButtonA.setVisibility(View.VISIBLE);
-        floatingActionButtonB.setVisibility(View.INVISIBLE);
 
-        rootView.findViewById(R.id.drive_toggle_fab1).setOnClickListener(new View.OnClickListener() {
+        rootView.findViewById(R.id.drive_toggle_fab).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
 
-                autocompleteStart.clearFocus();
-                autocompleteDestination.clearFocus();
-                Bundle arguments = new Bundle();
-                arguments.putString(Intent.EXTRA_TEXT, route_id);
-
-                DriveFragment fragment = new DriveFragment();
-                fragment.setArguments(arguments);
-
-                getActivity().getSupportFragmentManager().beginTransaction()
-                        .addToBackStack("back")
-                        .add(R.id.frag_container, fragment, FRAGMENT_TAG_REST)
-                        .commit();
-            }
-        });
-
-        rootView.findViewById(R.id.drive_toggle_fab2).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
                 autocompleteStart.clearFocus();
                 autocompleteDestination.clearFocus();
                 Bundle arguments = new Bundle();
@@ -524,13 +458,7 @@ public class MapFragment extends Fragment {
                     return;
                 }
                 mode = profile;
-                if (expanded) {
-                    rootView.findViewById(R.id.drive_toggle_fab1).setVisibility(View.VISIBLE);
-                    rootView.findViewById(R.id.drive_toggle_fab2).setVisibility(View.INVISIBLE);
-                } else {
-                    rootView.findViewById(R.id.drive_toggle_fab1).setVisibility(View.INVISIBLE);
-                    rootView.findViewById(R.id.drive_toggle_fab2).setVisibility(View.VISIBLE);
-                }
+                rootView.findViewById(R.id.drive_toggle_fab).setVisibility(View.VISIBLE);
                 try {
 
                     List<DirectionsWaypoint> mDirectionWaypoint = response.body().getWaypoints();
@@ -615,9 +543,9 @@ public class MapFragment extends Fragment {
                         double distance = currentRoute.getDistance();
                         if (distance > 1000) {
                             distance /= 1000;
-                            Toast.makeText(mActivity, getString(R.string.route_is) + distance + " km " + getString(R.string.long_str) + ".", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mActivity, String.format(Locale.US, "Route is %.2f km long.", distance), Toast.LENGTH_SHORT).show();
                         } else {
-                            Toast.makeText(mActivity, getString(R.string.route_is) + currentRoute.getDistance() + " meters " + getString(R.string.long_str) + ".", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mActivity, String.format(Locale.US, "Route is %.2f m long.", currentRoute.getDistance()), Toast.LENGTH_SHORT).show();
                         }
                     }
                     // Draw the route on the map
@@ -760,11 +688,9 @@ public class MapFragment extends Fragment {
 
                 }
             });
-            floatingActionButtonA.setImageResource(R.drawable.ic_location_disabled_24dp);
-            floatingActionButtonB.setImageResource(R.drawable.ic_location_disabled_24dp);
+            floatingActionButton.setImageResource(R.drawable.ic_location_disabled_24dp);
         } else {
-            floatingActionButtonA.setImageResource(R.drawable.ic_my_location_24dp);
-            floatingActionButtonB.setImageResource(R.drawable.ic_my_location_24dp);
+            floatingActionButton.setImageResource(R.drawable.ic_my_location_24dp);
             map.setMyLocationEnabled(false);
         }
         // Enable or disable the location layer on the map
