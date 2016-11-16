@@ -28,6 +28,7 @@
             android:layout_height="140dp"
             android:layout_gravity="center_horizontal"
             android:layout_margin="50dp"
+            android:contentDescription="@string/app_logo"
             android:src="@mipmap/ic_launcher" />
 
         <TextView

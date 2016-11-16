@@ -154,6 +154,7 @@
                                 android:layout_height="match_parent"
                                 android:layout_weight="1"
                                 android:background="?attr/selectableItemBackgroundBorderless"
+                                android:contentDescription="@string/get_present_location"
                                 android:src="@drawable/ic_my_location_white_24dp" />
 
                             <ImageButton
@@ -162,6 +163,7 @@
                                 android:layout_height="match_parent"
                                 android:layout_weight="1"
                                 android:background="?attr/selectableItemBackgroundBorderless"
+                                android:contentDescription="@string/swap"
                                 android:src="@drawable/ic_swap_vert_white_24dp" />
                         </LinearLayout>
                     </LinearLayout>
@@ -178,6 +180,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:contentDescription="@string/walk"
                             android:text="@string/walk" />
 
                         <Button
@@ -186,6 +189,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:contentDescription="@string/cycle"
                             android:text="@string/cycle" />
 
                         <Button
@@ -194,6 +198,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:contentDescription="@string/drive"
                             android:text="@string/drive" />
 
                     </LinearLayout>

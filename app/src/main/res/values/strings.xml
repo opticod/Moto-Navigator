@@ -45,5 +45,12 @@
     <string name="walk">Walk</string>
     <string name="cycle">Cycle</string>
     <string name="delete_all">Delete All</string>
+    <string name="app_logo">App Logo</string>
+    <string name="get_present_location">Get present location</string>
+    <string name="swap">Swap</string>
+    <string name="mode">Mode</string>
+    <string name="mode_car">Mode car</string>
+    <string name="mode_bike">Mode Bike</string>
+    <string name="mode_walk">Mode Walk</string>
 
 </resources>
