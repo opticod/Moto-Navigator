@@ -89,5 +89,7 @@
     <string name="sec">" sec"</string>
     <string name="km_long">km long.</string>
     <string name="m_long">m long.</string>
+    <string name="map">Map</string>
+    <string name="sign_out">Sign Out</string>
 
 </resources>

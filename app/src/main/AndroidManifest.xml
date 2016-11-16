@@ -18,7 +18,7 @@
         <activity
             android:name=".activity.LaunchScreenActivity"
             android:label="@string/app_name"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
+            android:theme="@style/AppThemeNoActionBarFullScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -27,7 +27,7 @@
         <activity
             android:name=".auth.AuthActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppThemeNoActionBarFullScreen" />
 
         <activity
             android:name=".activity.BaseActivity"
