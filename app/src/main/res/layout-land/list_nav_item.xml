@@ -23,8 +23,10 @@
         android:layout_gravity="center"
         android:layout_weight="2"
         android:gravity="center"
+        android:paddingEnd="@dimen/paddingMed"
         android:paddingLeft="@dimen/padding"
         android:paddingRight="@dimen/paddingMed"
+        android:paddingStart="@dimen/padding"
         android:textAppearance="?android:textAppearanceMedium" />
 
     <LinearLayout
@@ -39,8 +41,8 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:paddingLeft="@dimen/padding"
-            android:paddingRight="@dimen/padding"
+            android:paddingEnd="@dimen/padding"
+            android:paddingStart="@dimen/padding"
             android:textAppearance="?android:textAppearanceMedium" />
 
         <TextView
@@ -48,8 +50,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:paddingLeft="@dimen/padding"
-            android:paddingRight="@dimen/padding"
+            android:paddingEnd="@dimen/padding"
+            android:paddingStart="@dimen/padding"
             android:textAppearance="?android:textAppearanceMedium" />
 
     </LinearLayout>
@@ -68,8 +70,10 @@
             android:layout_weight="1"
             android:gravity="end|center_vertical"
             android:paddingBottom="@dimen/paddingSmall"
+            android:paddingEnd="@dimen/paddingMed"
             android:paddingLeft="@dimen/padding"
             android:paddingRight="@dimen/paddingMed"
+            android:paddingStart="@dimen/padding"
             android:paddingTop="@dimen/paddingSmall"
             android:textAppearance="?android:textAppearanceSmall" />
 
@@ -80,8 +84,10 @@
             android:layout_weight="1"
             android:gravity="end|center_vertical"
             android:paddingBottom="@dimen/paddingSmall"
+            android:paddingEnd="@dimen/paddingMed"
             android:paddingLeft="@dimen/padding"
             android:paddingRight="@dimen/paddingMed"
+            android:paddingStart="@dimen/padding"
             android:paddingTop="@dimen/paddingSmall"
             android:textAppearance="?android:textAppearanceSmall" />
 

@@ -40,8 +40,8 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp">
+            android:paddingEnd="16dp"
+            android:paddingStart="16dp">
 
             <EditText
                 android:id="@+id/field_email"
@@ -65,8 +65,8 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/email_password_fields"
             android:orientation="horizontal"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp">
+            android:paddingEnd="16dp"
+            android:paddingStart="16dp">
 
             <Button
                 android:id="@+id/email_sign_in_button"
@@ -92,7 +92,7 @@
         android:background="@color/grey_300"
         android:gravity="center"
         android:paddingBottom="16dp"
-        android:paddingLeft="16dp"
+        android:paddingStart="16dp"
         android:text="@string/or" />
 
     <LinearLayout
@@ -102,8 +102,8 @@
         android:background="@color/grey_300"
         android:orientation="horizontal"
         android:paddingBottom="16dp"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp">
+        android:paddingEnd="16dp"
+        android:paddingStart="16dp">
 
         <com.google.android.gms.common.SignInButton
             android:id="@+id/google_sign_in_button"
