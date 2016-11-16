@@ -1,7 +1,10 @@
 package work.technie.motonavigator.fragment;
 
 import android.app.Activity;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -9,11 +12,13 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -25,6 +30,7 @@ import work.technie.motonavigator.R;
 import work.technie.motonavigator.adapter.DirectionCollectionAdapter;
 import work.technie.motonavigator.data.MotorContract;
 import work.technie.motonavigator.data.Waypoints;
+import work.technie.motonavigator.widget.CollectionWidgetProvider;
 
 /**
  * Created by anupam on 14/11/16.
@@ -94,6 +100,7 @@ public class DriveCollectionFragment extends Fragment implements LoaderManager.L
         directionCollectionAdapter = new DirectionCollectionAdapter(getActivity(), null, 0);
         listViewDirCollection = (ListView) rootView.findViewById(R.id.listview_collection_dir);
         listViewDirCollection.setAdapter(directionCollectionAdapter);
+        listViewDirCollection.setEmptyView(rootView.findViewById(R.id.emptyElement));
 
         if (savedInstanceState == null || !savedInstanceState.containsKey("dirCollectionList")) {
             dirCollectionList = new ArrayList<>();
@@ -153,6 +160,36 @@ public class DriveCollectionFragment extends Fragment implements LoaderManager.L
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_collection, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.delete) {
+            final AlertDialog dialog = new AlertDialog.Builder(getActivity())
+                    .setTitle(R.string.dialog_delete_title)
+                    .setMessage(R.string.dialog_delete_msg)
+                    .setPositiveButton(R.string.dialog_yes, null)
+                    .setNegativeButton(R.string.dialog_no, null)
+                    .create();
+            dialog.show();
+
+            final LoaderManager.LoaderCallbacks loaderCallbacks = this;
+
+            dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dialog.dismiss();
+                    Uri uri = MotorContract.Waypoints.buildWaypointUri();
+                    getActivity().getContentResolver().delete(uri, null, null);
+                    getActivity().sendBroadcast(new Intent(CollectionWidgetProvider.ACTION_UPDATE));
+                    directionCollectionAdapter.swapCursor(null);
+                }
+            });
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
