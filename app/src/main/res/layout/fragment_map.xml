@@ -131,7 +131,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="0dp"
                             android:layout_weight="1"
-                            android:hint="Enter Starting Point"
+                            android:hint="@string/enter_starting_point"
                             android:maxLines="1" />
 
                         <com.mapbox.services.android.geocoder.ui.GeocoderAutoCompleteView
@@ -181,7 +181,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Walk" />
+                        android:text="@string/walk" />
 
                     <Button
                         android:id="@+id/cycle"
@@ -189,7 +189,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Cycle" />
+                        android:text="@string/cycle" />
 
                     <Button
                         android:id="@+id/drive"
@@ -197,7 +197,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Drive" />
+                        android:text="@string/drive" />
 
                 </LinearLayout>
             </LinearLayout>

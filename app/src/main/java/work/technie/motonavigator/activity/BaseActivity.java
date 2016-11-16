@@ -140,9 +140,6 @@ public class BaseActivity extends AppCompatActivity
                         .commit();
 
                 break;
-            case R.id.nav_settings:
-                //Add transaction to settings fragment
-                break;
             case R.id.nav_about:
 
                 fragmentManager.beginTransaction()

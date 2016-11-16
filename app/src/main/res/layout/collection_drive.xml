@@ -33,7 +33,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:gravity="center"
-            android:text="No Drives Available!"
+            android:text="@string/no_drives_available"
             android:textAppearance="?android:textAppearanceMedium"
             android:visibility="gone" />
     </LinearLayout>

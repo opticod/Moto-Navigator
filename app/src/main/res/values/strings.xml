@@ -24,5 +24,26 @@
     <string name="dialog_delete_msg">Are you sure you want to delete this item?</string>
     <string name="dialog_yes">Yes</string>
     <string name="dialog_no">No</string>
+    <string name="welcome">Welcome %s</string>
+    <string name="about">About</string>
+    <string name="drive">Drive</string>
+    <string name="network_unavailable">Network Unavailable! Please try later!</string>
+    <string name="network_info">Network Unavailable! Some feature may not work properly!</string>
+    <string name="choose_dest">Choose Destination...</string>
+    <string name="set_origin">Set Origin!</string>
+    <string name="set_dest">Set Destination!</string>
+    <string name="route_is">"Route is "</string>
+    <string name="long_str">long</string>
+    <string name="moto_navigator">Moto Navigator</string>
+    <string name="by">by</string>
+    <string name="anupam_das">ANUPAM DAS</string>
+    <string name="opticod">(opticod)</string>
+    <string name="or">OR</string>
+    <string name="guest_login">GUEST LOGIN</string>
+    <string name="no_drives_available">No Drives Available!</string>
+    <string name="enter_starting_point">Enter Starting Point</string>
+    <string name="walk">Walk</string>
+    <string name="cycle">Cycle</string>
+    <string name="delete_all">Delete All</string>
 
 </resources>

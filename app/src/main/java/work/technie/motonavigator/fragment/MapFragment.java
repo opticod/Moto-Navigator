@@ -138,9 +138,6 @@ public class MapFragment extends Fragment {
             }
         });
 
-
-
-
         locationServices = LocationServices.getLocationServices(mActivity);
 
         mapView = (MapView) rootView.findViewById(R.id.mapView);
@@ -175,7 +172,7 @@ public class MapFragment extends Fragment {
                         toggleGps(!map.isMyLocationEnabled(), autocompleteStart);
                     }
                 } else {
-                    Toast.makeText(mActivity, "Network Unavailable! Please try later!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mActivity, R.string.network_unavailable, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -189,14 +186,14 @@ public class MapFragment extends Fragment {
                         toggleGps(!map.isMyLocationEnabled(), autocompleteStart);
                     }
                 } else {
-                    Toast.makeText(mActivity, "Network Unavailable! Please try later!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mActivity, R.string.network_unavailable, Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
 
         if (!Utility.hasNetworkConnection(mActivity)) {
-            Toast.makeText(mActivity, "Network Unavailable! Some feature may not work properly!", Toast.LENGTH_LONG).show();
+            Toast.makeText(mActivity, R.string.network_info, Toast.LENGTH_LONG).show();
         }
 
         ImageButton getCurrentLoc = (ImageButton) rootView.findViewById(R.id.get_current_location);
@@ -264,7 +261,7 @@ public class MapFragment extends Fragment {
                         }
                     }
                 } else {
-                    Toast.makeText(mActivity, "Network Unavailable! Please try later!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mActivity, R.string.network_unavailable, Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -286,7 +283,7 @@ public class MapFragment extends Fragment {
                         }
                     }
                 } else {
-                    Toast.makeText(mActivity, "Network Unavailable! Please try later!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mActivity, R.string.network_unavailable, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -307,7 +304,7 @@ public class MapFragment extends Fragment {
                         }
                     }
                 } else {
-                    Toast.makeText(mActivity, "Network Unavailable! Please try later!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mActivity, R.string.network_unavailable, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -341,7 +338,7 @@ public class MapFragment extends Fragment {
                 }
                 if (scrollRange + verticalOffset == 0) {
                     expanded = false;
-                    collapsingToolbarLayout.setTitle("Choose Destination...");
+                    collapsingToolbarLayout.setTitle(getString(R.string.choose_dest));
                     floatingActionButtonA.setVisibility(View.INVISIBLE);
                     floatingActionButtonB.setVisibility(View.VISIBLE);
 
@@ -497,12 +494,12 @@ public class MapFragment extends Fragment {
 
         if (null == origin) {
             Log.e(TAG, "Origin empty");
-            Toast.makeText(mActivity, "Set Origin!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mActivity, R.string.set_origin, Toast.LENGTH_SHORT).show();
             return;
         }
         if (null == destination) {
             Log.e(TAG, "Destination empty");
-            Toast.makeText(mActivity, "Set Destination!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mActivity, R.string.set_dest, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -615,7 +612,13 @@ public class MapFragment extends Fragment {
                     Log.d(TAG, "Inserted: " + inserted);
                     Log.d(TAG, "Distance: " + currentRoute.getDistance() + " " + currentRoute.getLegs().size());
                     if (info) {
-                        Toast.makeText(mActivity, "Route is " + currentRoute.getDistance() + " meters long.", Toast.LENGTH_SHORT).show();
+                        double distance = currentRoute.getDistance();
+                        if (distance > 1000) {
+                            distance /= 1000;
+                            Toast.makeText(mActivity, getString(R.string.route_is) + distance + " km " + getString(R.string.long_str) + ".", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(mActivity, getString(R.string.route_is) + currentRoute.getDistance() + " meters " + getString(R.string.long_str) + ".", Toast.LENGTH_SHORT).show();
+                        }
                     }
                     // Draw the route on the map
                     drawRoute(currentRoute, profile);

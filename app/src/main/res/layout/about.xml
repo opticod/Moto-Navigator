@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_margin="@dimen/cardview_default_radius"
-            android:text="Moto Navigator"
+            android:text="@string/moto_navigator"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="#de000000"
             android:textStyle="bold" />
@@ -45,21 +45,21 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_margin="@dimen/cardview_default_radius"
-            android:text="by" />
+            android:text="@string/by" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_margin="@dimen/cardview_default_radius"
-            android:text="ANUPAM DAS" />
+            android:text="@string/anupam_das" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_margin="@dimen/cardview_default_radius"
-            android:text="(opticod)" />
+            android:text="@string/opticod" />
 
         <TextView
             android:layout_width="wrap_content"

@@ -16,7 +16,6 @@
         android:gravity="center"
         android:paddingLeft="@dimen/padding"
         android:paddingRight="@dimen/paddingMed"
-        android:text="TYPE"
         android:textAppearance="?android:textAppearanceMedium" />
 
     <TextView
@@ -27,7 +26,6 @@
         android:layout_weight="4"
         android:paddingLeft="@dimen/padding"
         android:paddingRight="@dimen/padding"
-        android:text="Head northeast on MDR	"
         android:textAppearance="?android:textAppearanceMedium" />
 
     <LinearLayout
@@ -48,7 +46,6 @@
             android:paddingLeft="@dimen/padding"
             android:paddingRight="@dimen/paddingMed"
             android:paddingTop="@dimen/paddingSmall"
-            android:text="2707.8m"
             android:textAppearance="?android:textAppearanceSmall" />
 
         <TextView
@@ -61,7 +58,6 @@
             android:paddingLeft="@dimen/padding"
             android:paddingRight="@dimen/paddingMed"
             android:paddingTop="@dimen/paddingSmall"
-            android:text="1949.9sec"
             android:textAppearance="?android:textAppearanceSmall" />
 
     </LinearLayout>
