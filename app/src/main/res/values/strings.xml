@@ -16,5 +16,9 @@
     <string name="auth_failed">Authentication failed</string>
 
     <string name="choose_destination">Choose Destination</string>
+    <string name="logo_widget">Logo Widget</string>
+    <string name="drives">Drives</string>
+    <string name="empty_list">No drives available!</string>
+    <string name="bullet">"•"</string>
 
 </resources>

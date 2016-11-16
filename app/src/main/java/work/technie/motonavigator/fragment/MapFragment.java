@@ -73,6 +73,7 @@ import work.technie.motonavigator.R;
 import work.technie.motonavigator.data.MapData;
 import work.technie.motonavigator.data.MotorContract;
 import work.technie.motonavigator.utils.Utility;
+import work.technie.motonavigator.widget.CollectionWidgetProvider;
 
 /**
  * Created by anupam on 14/11/16.
@@ -606,6 +607,8 @@ public class MapFragment extends Fragment {
                         inserted = mActivity.getContentResolver().bulkInsert(MotorContract.Steps.CONTENT_URI, cvArray);
                     }
                     mActivity.getContentResolver().insert(MotorContract.Waypoints.CONTENT_URI, mWaypoint);
+
+                    mActivity.sendBroadcast(new Intent(CollectionWidgetProvider.ACTION_UPDATE));
 
                     // Print some info about the route
                     currentRoute = response.body().getRoutes().get(0);

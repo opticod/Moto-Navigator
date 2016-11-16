@@ -37,7 +37,27 @@
         <provider
             android:name=".data.MotorProvider"
             android:authorities="work.technie.motonavigator"
-            android:exported="false" />
+            android:exported="true" />
+
+        <receiver
+            android:name=".widget.CollectionWidgetProvider"
+            android:enabled="true"
+            android:label="Drives">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="work.technie.motonavigator.ACTION_DATA_UPDATED" />
+                <action android:name="work.technie.motonavigator.UPDATE_MY_WIDGET" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_info" />
+        </receiver>
+
+        <service
+            android:name=".widget.NavWidgetRemoteViewsService"
+            android:enabled="true"
+            android:exported="false"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
     </application>
 
 </manifest>

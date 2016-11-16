@@ -14,4 +14,8 @@
     <dimen name="paddingMed">16dp</dimen>
 
 
+    <dimen name="widget_margin">8dp</dimen>
+    <dimen name="widget_default_height">180dp</dimen>
+    <dimen name="widget_min_resize_width">220dp</dimen>
+    <dimen name="main_menu_item_height">48dp</dimen>
 </resources>

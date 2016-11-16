@@ -9,8 +9,11 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -63,10 +66,6 @@ public class DriveCollectionFragment extends Fragment implements LoaderManager.L
     private ArrayList<Waypoints> dirCollectionList;
     private int mPosition = ListView.INVALID_POSITION;
 
-    public DriveCollectionFragment() {
-        setHasOptionsMenu(true);
-    }
-
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putParcelableArrayList("dirCollectionList", dirCollectionList);
@@ -84,6 +83,7 @@ public class DriveCollectionFragment extends Fragment implements LoaderManager.L
         Activity mActivity = getActivity();
         Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
         toolbar.setTitle("Drive");
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
 
         DrawerLayout drawer = (DrawerLayout) mActivity.findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -113,7 +113,6 @@ public class DriveCollectionFragment extends Fragment implements LoaderManager.L
                 mPosition = position;
             }
         });
-
         return rootView;
     }
 
@@ -143,6 +142,17 @@ public class DriveCollectionFragment extends Fragment implements LoaderManager.L
                 break;
         }
         return null;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_collection, menu);
     }
 
     @Override

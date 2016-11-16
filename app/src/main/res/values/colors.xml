@@ -9,5 +9,8 @@
 
     <color name="grey_100">#F5F5F5</color>
     <color name="grey_300">#E0E0E0</color>
+    <color name="grey">#E0E0E0</color>
+    <color name="secondary_text">#727272</color>
+    <color name="primary_text">#212121</color>
 
 </resources>

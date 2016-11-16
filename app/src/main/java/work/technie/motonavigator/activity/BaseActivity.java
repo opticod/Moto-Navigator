@@ -72,9 +72,23 @@ public class BaseActivity extends AppCompatActivity
             currentMenuItemId = savedInstanceState.getInt(STATE_FRAGMENT);
         }
 
-        if (getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG_MAP) == null && getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG_REST) == null) {
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            String routeId = extras.getString("route_id");
+            Bundle arguments = new Bundle();
+            arguments.putString(Intent.EXTRA_TEXT, routeId);
+
+            DriveFragment fragment = new DriveFragment();
+            fragment.setArguments(arguments);
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frag_container, fragment, FRAGMENT_TAG_REST)
+                    .commit();
+
+        } else if (getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG_MAP) == null && getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG_REST) == null) {
             doMenuAction(currentMenuItemId);
         }
+
     }
 
     @Override
@@ -86,12 +100,12 @@ public class BaseActivity extends AppCompatActivity
         } else {
             if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
                 getSupportFragmentManager().popBackStack();
-                return;
             } else {
                 finish();
             }
         }
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -101,8 +115,10 @@ public class BaseActivity extends AppCompatActivity
                 FragmentManager fm = getSupportFragmentManager();
                 if (fm.getBackStackEntryCount() > 0) {
                     fm.popBackStack();
+                    return true;
+                } else {
+                    finish();
                 }
-                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

@@ -30,7 +30,8 @@ public class MotorDBHelper extends SQLiteOpenHelper {
                 Waypoints.MODE + "  TEXT," +
                 Waypoints.ROUTE_ID + "  TEXT," +
                 Waypoints.ROUTE_DURATION + "  TEXT," +
-                Waypoints.ROUTE_DISTANCE + " TEXT)";
+                Waypoints.ROUTE_DISTANCE + " TEXT,"
+                + "UNIQUE (" + Waypoints.START_NAME + "," + Waypoints.DEST_NAME + "," + Waypoints.MODE + ") ON CONFLICT REPLACE)";
 
         final String SQL_CREATE__TABLE_STEPS = "CREATE TABLE " + Steps.TABLE_NAME + " (" +
                 Steps._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
