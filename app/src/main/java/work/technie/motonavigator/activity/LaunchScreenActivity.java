@@ -1,9 +1,9 @@
 package work.technie.motonavigator.activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -15,7 +15,7 @@ import work.technie.motonavigator.auth.AuthActivity;
 /**
  * Created by anupam on 7/11/16.
  */
-public class LaunchScreenActivity extends Activity {
+public class LaunchScreenActivity extends AppCompatActivity {
 
     private static final String TAG = "SplashScreen";
 
