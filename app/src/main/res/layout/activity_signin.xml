@@ -6,7 +6,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="@dimen/zero"
         android:layout_weight="2.82"
         android:gravity="center_horizontal"
         android:orientation="vertical">
@@ -16,7 +16,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:contentDescription="@string/desc_firebase_lockup"
-            android:paddingTop="70dp"
+            android:paddingTop="@dimen/padding_top_sign_in"
             android:src="@mipmap/ic_launcher" />
 
         <TextView
@@ -30,7 +30,7 @@
 
     <RelativeLayout
         android:layout_width="fill_parent"
-        android:layout_height="0dp"
+        android:layout_height="@dimen/zero"
         android:layout_weight="1"
         android:background="@color/grey_300"
         android:gravity="center_vertical">
@@ -40,12 +40,12 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:paddingEnd="16dp"
-            android:paddingStart="16dp">
+            android:paddingEnd="@dimen/title_bottom_margin"
+            android:paddingStart="@dimen/title_bottom_margin">
 
             <EditText
                 android:id="@+id/field_email"
-                android:layout_width="0dp"
+                android:layout_width="@dimen/zero"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="@string/hint_email"
@@ -53,7 +53,7 @@
 
             <EditText
                 android:id="@+id/field_password"
-                android:layout_width="0dp"
+                android:layout_width="@dimen/zero"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="@string/hint_password"
@@ -65,12 +65,12 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/email_password_fields"
             android:orientation="horizontal"
-            android:paddingEnd="16dp"
-            android:paddingStart="16dp">
+            android:paddingEnd="@dimen/title_bottom_margin"
+            android:paddingStart="@dimen/title_bottom_margin">
 
             <Button
                 android:id="@+id/email_sign_in_button"
-                android:layout_width="0dp"
+                android:layout_width="@dimen/zero"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:contentDescription="@string/sign_in"
@@ -79,7 +79,7 @@
 
             <Button
                 android:id="@+id/email_create_account_button"
-                android:layout_width="0dp"
+                android:layout_width="@dimen/zero"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:contentDescription="@string/create_account"
@@ -93,9 +93,9 @@
         android:layout_height="wrap_content"
         android:background="@color/grey_300"
         android:gravity="center"
-        android:paddingBottom="16dp"
-        android:paddingLeft="16dp"
-        android:paddingStart="16dp"
+        android:paddingBottom="@dimen/title_bottom_margin"
+        android:paddingLeft="@dimen/title_bottom_margin"
+        android:paddingStart="@dimen/title_bottom_margin"
         android:text="@string/or" />
 
     <LinearLayout
@@ -103,19 +103,19 @@
         android:layout_height="wrap_content"
         android:background="@color/grey_300"
         android:orientation="horizontal"
-        android:paddingBottom="16dp"
-        android:paddingEnd="16dp"
-        android:paddingStart="16dp">
+        android:paddingBottom="@dimen/title_bottom_margin"
+        android:paddingEnd="@dimen/title_bottom_margin"
+        android:paddingStart="@dimen/title_bottom_margin">
 
         <com.google.android.gms.common.SignInButton
             android:id="@+id/google_sign_in_button"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/zero"
             android:layout_height="wrap_content"
             android:layout_weight="1" />
 
         <Button
             android:id="@+id/guest_sign_in_button"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/zero"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:contentDescription="@string/guest_login"

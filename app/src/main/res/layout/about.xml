@@ -25,9 +25,9 @@
 
         <ImageView
             android:layout_width="wrap_content"
-            android:layout_height="140dp"
+            android:layout_height="@dimen/app_logo_height"
             android:layout_gravity="center_horizontal"
-            android:layout_margin="50dp"
+            android:layout_margin="@dimen/app_logo_margin"
             android:contentDescription="@string/app_logo"
             android:src="@mipmap/ic_launcher" />
 
@@ -38,7 +38,7 @@
             android:layout_margin="@dimen/cardview_default_radius"
             android:text="@string/moto_navigator"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="#de000000"
+            android:textColor="@color/primary_text"
             android:textStyle="bold" />
 
         <TextView
@@ -63,12 +63,15 @@
             android:text="@string/opticod" />
 
         <TextView
+            android:id="@+id/link"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_margin="@dimen/cardview_default_radius"
-            android:paddingEnd="45dp"
-            android:paddingStart="45dp"
+            android:autoLink="web"
+            android:linksClickable="true"
+            android:paddingEnd="@dimen/padding_xlarge"
+            android:paddingStart="@dimen/padding_xlarge"
             android:text="@string/about_text" />
 
     </LinearLayout>

@@ -9,6 +9,7 @@
     <dimen name="icon_top_margin">24dp</dimen>
     <dimen name="icon_bottom_margin">24dp</dimen>
     <dimen name="title_bottom_margin">16dp</dimen>
+    <dimen name="negative_margin">-24dp</dimen>
     <dimen name="paddingSmall">4dp</dimen>
     <dimen name="padding">8dp</dimen>
     <dimen name="paddingMed">16dp</dimen>
@@ -18,4 +19,16 @@
     <dimen name="widget_default_height">180dp</dimen>
     <dimen name="widget_min_resize_width">220dp</dimen>
     <dimen name="main_menu_item_height">48dp</dimen>
+    <dimen name="app_logo_height">140dp</dimen>
+    <dimen name="app_logo_margin">50dp</dimen>
+    <dimen name="padding_xlarge">45dp</dimen>
+    <dimen name="zero">0dp</dimen>
+    <dimen name="padding_top_sign_in">70dp</dimen>
+    <dimen name="margin_side_menu">30dp</dimen>
+    <dimen name="margin_top_search">28dp</dimen>
+    <dimen name="padding_top_search">6dp</dimen>
+    <dimen name="margin_end_collapsing_toolbar">64dp</dimen>
+    <dimen name="widget_list_item_height">56dp</dimen>
+    <dimen name="margin_start_collapsing_toolbar">48dp</dimen>
+    <dimen name="widget_logo_icon">34dp</dimen>
 </resources>

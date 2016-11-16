@@ -28,7 +28,7 @@ public class AboutFragment extends Fragment {
         rootView = inflater.inflate(R.layout.about, container, false);
         Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.about);
-        ;
+
         DrawerLayout drawer = (DrawerLayout) mActivity.findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 mActivity, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);

@@ -2,7 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_list_item"
     android:layout_width="match_parent"
-    android:layout_height="56dp"
+    android:layout_height="@dimen/widget_list_item_height"
     android:background="@drawable/touch_selector_white">
 
     <LinearLayout
@@ -18,7 +18,7 @@
 
         <ImageView
             android:id="@+id/modeCar"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/zero"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
@@ -29,7 +29,7 @@
 
         <ImageView
             android:id="@+id/modeBike"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/zero"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
@@ -40,7 +40,7 @@
 
         <ImageView
             android:id="@+id/modeWalk"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/zero"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
@@ -51,7 +51,7 @@
 
         <TextView
             android:id="@+id/start_name"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/zero"
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:layout_weight="4"
@@ -62,7 +62,7 @@
             android:textColor="@color/secondary_text" />
 
         <ImageView
-            android:layout_width="0dp"
+            android:layout_width="@dimen/zero"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
@@ -71,7 +71,7 @@
 
         <TextView
             android:id="@+id/dest_name"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/zero"
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:layout_weight="4"

@@ -23,9 +23,9 @@
                 android:layout_above="@+id/location_toggle_fab"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
-                android:layout_margin="16dp"
+                android:layout_margin="@dimen/title_bottom_margin"
                 android:src="@drawable/ic_directions_white_24dp"
-                mapbox:backgroundTint="#E55E5E" />
+                mapbox:backgroundTint="@color/colorAccent" />
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/location_toggle_fab"
@@ -34,18 +34,18 @@
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
-                android:layout_marginBottom="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginRight="16dp"
+                android:layout_marginBottom="@dimen/title_bottom_margin"
+                android:layout_marginEnd="@dimen/title_bottom_margin"
+                android:layout_marginRight="@dimen/title_bottom_margin"
                 android:src="@drawable/ic_my_location_24dp"
-                mapbox:backgroundTint="#E55E5E" />
+                mapbox:backgroundTint="@color/colorAccent" />
 
         </RelativeLayout>
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="-24dp"
+            android:layout_marginTop="@dimen/negative_margin"
             android:clipToPadding="true"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
@@ -73,8 +73,8 @@
                 android:layout_height="match_parent"
                 android:fitsSystemWindows="true"
                 app:contentScrim="?attr/colorPrimary"
-                app:expandedTitleMarginEnd="64dp"
-                app:expandedTitleMarginStart="48dp"
+                app:expandedTitleMarginEnd="@dimen/margin_end_collapsing_toolbar"
+                app:expandedTitleMarginStart="@dimen/margin_start_collapsing_toolbar"
                 app:expandedTitleTextAppearance="@android:color/transparent"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
@@ -83,22 +83,22 @@
                     android:layout_height="wrap_content"
                     android:fitsSystemWindows="true"
                     android:orientation="vertical"
-                    android:paddingEnd="16dp"
-                    android:paddingRight="16dp"
+                    android:paddingEnd="@dimen/title_bottom_margin"
+                    android:paddingRight="@dimen/title_bottom_margin"
                     android:scaleType="centerCrop"
                     android:weightSum="5"
                     app:layout_collapseMode="parallax">
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="0dp"
+                        android:layout_height="@dimen/zero"
                         android:layout_weight="3"
                         android:orientation="horizontal"
-                        android:paddingTop="6dp"
+                        android:paddingTop="@dimen/padding_top_search"
                         android:weightSum="10">
 
                         <LinearLayout
-                            android:layout_width="0dp"
+                            android:layout_width="@dimen/zero"
                             android:layout_height="match_parent"
                             android:layout_weight="2"
                             android:orientation="vertical"
@@ -106,19 +106,19 @@
 
                             <View
                                 android:layout_width="match_parent"
-                                android:layout_height="0dp"
+                                android:layout_height="@dimen/zero"
                                 android:layout_weight="1" />
 
                             <View
                                 android:layout_width="match_parent"
-                                android:layout_height="0dp"
+                                android:layout_height="@dimen/zero"
                                 android:layout_weight="1" />
                         </LinearLayout>
 
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
-                            android:layout_marginTop="28dp"
+                            android:layout_marginTop="@dimen/margin_top_search"
                             android:layout_weight="6"
                             android:orientation="vertical"
                             android:weightSum="2">
@@ -126,7 +126,7 @@
                             <com.mapbox.services.android.geocoder.ui.GeocoderAutoCompleteView
                                 android:id="@+id/query_start"
                                 android:layout_width="match_parent"
-                                android:layout_height="0dp"
+                                android:layout_height="@dimen/zero"
                                 android:layout_weight="1"
                                 android:hint="@string/enter_starting_point"
                                 android:maxLines="1" />
@@ -134,16 +134,16 @@
                             <com.mapbox.services.android.geocoder.ui.GeocoderAutoCompleteView
                                 android:id="@+id/query_destination"
                                 android:layout_width="match_parent"
-                                android:layout_height="0dp"
+                                android:layout_height="@dimen/zero"
                                 android:layout_weight="1"
                                 android:hint="@string/choose_destination"
                                 android:maxLines="1" />
                         </LinearLayout>
 
                         <LinearLayout
-                            android:layout_width="0dp"
+                            android:layout_width="@dimen/zero"
                             android:layout_height="match_parent"
-                            android:layout_marginTop="30dp"
+                            android:layout_marginTop="@dimen/margin_side_menu"
                             android:layout_weight="2"
                             android:orientation="vertical"
                             android:weightSum="2">
@@ -177,7 +177,7 @@
                         <Button
                             android:id="@+id/walk"
                             style="?android:attr/borderlessButtonStyle"
-                            android:layout_width="0dp"
+                            android:layout_width="@dimen/zero"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:contentDescription="@string/walk"
@@ -186,7 +186,7 @@
                         <Button
                             android:id="@+id/cycle"
                             style="?android:attr/borderlessButtonStyle"
-                            android:layout_width="0dp"
+                            android:layout_width="@dimen/zero"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:contentDescription="@string/cycle"
@@ -195,7 +195,7 @@
                         <Button
                             android:id="@+id/drive"
                             style="?android:attr/borderlessButtonStyle"
-                            android:layout_width="0dp"
+                            android:layout_width="@dimen/zero"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:contentDescription="@string/drive"
