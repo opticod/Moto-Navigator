@@ -91,5 +91,7 @@
     <string name="m_long">m long.</string>
     <string name="map">Map</string>
     <string name="sign_out">Sign Out</string>
+    <string name="start_navigation">Start Navigation</string>
+    <string name="toogle_location_service">Toogle Location Service</string>
 
 </resources>
