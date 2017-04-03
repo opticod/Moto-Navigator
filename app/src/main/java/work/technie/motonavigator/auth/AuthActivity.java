@@ -138,19 +138,21 @@ public class AuthActivity extends BaseActivity implements
                             Log.w(TAG, getString(R.string.signInAnonym), task.getException());
                             Toast.makeText(AuthActivity.this, R.string.authentication_failed,
                                     Toast.LENGTH_SHORT).show();
+                        } else {
+                            SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPref.edit();
+                            editor.putInt(getString(R.string.login_mode), ANONYMOUS_SIGN_IN);
+                            editor.apply();
+
+                            Intent intent = new Intent(mActivity, work.technie.motonavigator.activity.BaseActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
                         }
 
                         // [START_EXCLUDE]
                         hideProgressDialog();
 
-                        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
-                        SharedPreferences.Editor editor = sharedPref.edit();
-                        editor.putInt(getString(R.string.login_mode), ANONYMOUS_SIGN_IN);
-                        editor.apply();
 
-                        Intent intent = new Intent(mActivity, work.technie.motonavigator.activity.BaseActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
 
                         // [END_EXCLUDE]
                     }
